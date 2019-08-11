@@ -1,8 +1,5 @@
 use crate::{
-    http_route::{
-        HttpMethod,
-        split_path
-    },
+    http_route::HttpMethod,
     response::Response
 };
 use std::convert::Into;
@@ -26,11 +23,11 @@ impl HttpServer {
         _handler: fn() -> Responsable,
     ) -> &mut Self
     where
-        Responsable: Into<Response>,
+        Responsable: Into<Response>
     {
         self.routes.push(HttpHandler(crate::HttpRoute {
             method: HttpMethod::GET,
-            route: split_path(path.to_string())
+            route: path.to_string()
         }, 7));
 
         self

@@ -14,6 +14,6 @@ fn main() {
     //     .get("/", |_, _| "ok")
     //     .launch(8080);
     let mut x = http_server::new();
-    x.get("/", || "ok");
+    x.get("/stats/:num", || "ok");
     println!("{:#?}", x);
 }
