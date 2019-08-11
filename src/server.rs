@@ -4,6 +4,8 @@ use crate::{
 };
 use std::convert::Into;
 
+// type HttpListener = &dyn Fn() -> ;
+
 #[derive(Debug)]
 struct HttpHandler(crate::HttpRoute, i32);
 
@@ -18,11 +20,11 @@ impl HttpServer {
     }
 
     pub fn add_listener<Responsable>(
-        &mut self,
+        mut self,
         method: HttpMethod,
         path: &'static str,
         _handler: fn() -> Responsable,
-    ) -> &mut Self
+    ) -> Self
     where
         Responsable: Into<Response>
     {
@@ -35,10 +37,10 @@ impl HttpServer {
     }
 
     pub fn get<Responsable>(
-        &mut self,
+        mut self,
         path: &'static str,
         _handler: fn() -> Responsable,
-    ) -> &mut Self
+    ) -> Self
     where
         Responsable: Into<Response>
     {
@@ -51,10 +53,10 @@ impl HttpServer {
     }
 
     pub fn post<Responsable>(
-        &mut self,
+        mut self,
         path: &'static str,
         _handler: fn() -> Responsable,
-    ) -> &mut Self
+    ) -> Self
     where
         Responsable: Into<Response>
     {
