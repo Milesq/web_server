@@ -25,9 +25,7 @@ impl HttpServer {
         path: &'static str,
         _handler: fn() -> Responsable,
     ) -> Self
-    where
-        Responsable: Into<Response>
-    {
+    where Responsable: Into<Response> {
         self.routes.push(HttpHandler(crate::HttpRoute {
             method: method,
             route: path.to_string()
@@ -37,34 +35,20 @@ impl HttpServer {
     }
 
     pub fn get<Responsable>(
-        mut self,
+        self,
         path: &'static str,
         _handler: fn() -> Responsable,
     ) -> Self
-    where
-        Responsable: Into<Response>
-    {
-        self.routes.push(HttpHandler(crate::HttpRoute {
-            method: HttpMethod::GET,
-            route: path.to_string()
-        }, 7));
-
-        self
+    where Responsable: Into<Response> {
+        self.route(HttpMethod::GET, path, _handler)
     }
 
     pub fn post<Responsable>(
-        mut self,
+        self,
         path: &'static str,
         _handler: fn() -> Responsable,
     ) -> Self
-    where
-        Responsable: Into<Response>
-    {
-        self.routes.push(HttpHandler(crate::HttpRoute {
-            method: HttpMethod::POST,
-            route: path.to_string()
-        }, 7));
-
-        self
+    where Responsable: Into<Response> {
+        self.route(HttpMethod::POST, path, _handler)
     }
 }
