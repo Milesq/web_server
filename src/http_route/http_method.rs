@@ -3,11 +3,9 @@
 pub enum HttpMethod {
     GET,
     HEAD,
-    PUT,
     POST,
+    PUT,
     DELETE,
-    OPTIONS,
     TRACE,
-    CONNECT,
-    PATCH
+    OPTIONS
 }
