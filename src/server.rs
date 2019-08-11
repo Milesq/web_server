@@ -1,8 +1,12 @@
-use crate::http_route::HttpMethod;
+use std::convert::Into;
+use crate::{
+    http_route::HttpMethod,
+    response::Response
+};
 
 #[derive(Debug)]
 pub struct HttpServer {
-    pub routes: Vec<crate::HttpRoute>
+    routes: Vec<crate::HttpRoute>
 }
 
 impl HttpServer {
@@ -12,11 +16,13 @@ impl HttpServer {
         }
     }
 
-    pub fn get(&mut self, _path: &str, _handler: fn() -> ()) -> &mut Self {
+    pub fn get<Responsable>(&mut self, _path: &'static str, _handler: fn() -> Responsable) -> &mut Self
+        where Responsable: Into<Response> {
         self.routes.push(crate::HttpRoute {
             method: HttpMethod::GET,
             route: vec!["/".into()]
         });
+
         self
     }
 }

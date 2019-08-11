@@ -13,6 +13,7 @@ fn main() {
     // http_server::new()
     //     .get("/", |_, _| "ok")
     //     .launch(8080);
-    let x = http_server::new();
-    println!("{:?}", x);
+    let mut x = http_server::new();
+    x.get("/", || "ok");
+    println!("{:#?}", x);
 }
