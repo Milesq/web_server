@@ -17,6 +17,23 @@ impl HttpServer {
         HttpServer { routes: Vec::new() }
     }
 
+    pub fn add_listener<Responsable>(
+        &mut self,
+        method: HttpMethod,
+        path: &'static str,
+        _handler: fn() -> Responsable,
+    ) -> &mut Self
+    where
+        Responsable: Into<Response>
+    {
+        self.routes.push(HttpHandler(crate::HttpRoute {
+            method: method,
+            route: path.to_string()
+        }, 7));
+
+        self
+    }
+
     pub fn get<Responsable>(
         &mut self,
         path: &'static str,
