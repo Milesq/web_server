@@ -19,7 +19,7 @@ impl HttpServer {
         HttpServer { routes: Vec::new() }
     }
 
-    pub fn add_listener<Responsable>(
+    pub fn route<Responsable>(
         mut self,
         method: HttpMethod,
         path: &'static str,
