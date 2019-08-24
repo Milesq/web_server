@@ -2,53 +2,51 @@ use crate::{
     http_route::HttpMethod,
     response::Response
 };
-use std::convert::Into;
 
-// type HttpListener = &dyn Fn() -> ;
+type RequestHandler = fn() -> Response;
 
+// first parameter = http path + http method
+// second parameter = function handler
 #[derive(Debug)]
-struct HttpHandler(crate::HttpRoute, i32);
+struct HttpHandler(crate::HttpRoute, RequestHandler);
 
 #[derive(Debug)]
 pub struct HttpServer {
     routes: Vec<HttpHandler>
 }
 
-impl HttpServer {
+impl<'a> HttpServer {
     pub fn new() -> HttpServer {
         HttpServer { routes: Vec::new() }
     }
 
-    pub fn route<Responsable>(
+    pub fn route<'b>(
         mut self,
         method: HttpMethod,
         path: &'static str,
-        _handler: fn() -> Responsable,
-    ) -> Self
-    where Responsable: Into<Response> {
+        handler: RequestHandler,
+    ) -> Self {
         self.routes.push(HttpHandler(crate::HttpRoute {
             method: method,
             route: path.to_string()
-        }, 7));
+        }, handler));
 
         self
     }
 
-    pub fn get<Responsable>(
+    pub fn get(
         self,
         path: &'static str,
-        _handler: fn() -> Responsable,
-    ) -> Self
-    where Responsable: Into<Response> {
-        self.route(HttpMethod::GET, path, _handler)
+        handler: RequestHandler,
+    ) -> Self {
+        self.route(HttpMethod::GET, path, handler)
     }
 
-    pub fn post<Responsable>(
+    pub fn post(
         self,
         path: &'static str,
-        _handler: fn() -> Responsable,
-    ) -> Self
-    where Responsable: Into<Response> {
-        self.route(HttpMethod::POST, path, _handler)
+        handler: RequestHandler,
+    ) -> Self {
+        self.route(HttpMethod::POST, path, handler)
     }
 }

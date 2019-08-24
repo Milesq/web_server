@@ -4,6 +4,7 @@ use std::{
 };
 
 #[allow(dead_code)]
+#[derive(Debug)]
 pub struct Response {
     response_code: u16,
     response_code_name: String,
@@ -49,6 +50,7 @@ impl Into<String> for Response {
 }
 
 #[allow(dead_code)]
+#[derive(Debug)]
 enum HttpVersion {
     Ver1,
     Ver11,
