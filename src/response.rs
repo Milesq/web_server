@@ -1,6 +1,10 @@
 use std::{
     collections::HashMap,
     convert::{From, Into},
+    fmt::{
+        self,
+        Display
+    }
 };
 
 use crate::HttpVersion;
@@ -23,17 +27,12 @@ impl Response {
 
     #[inline]
     pub fn get_response_code_name(&self) -> String {
-        self.response_code_name
+        self.response_code_name.clone()
     }
 
     #[inline]
     pub fn get_http_version(&self) -> HttpVersion {
         self.http_version
-    }
-
-    #[inline]
-    pub fn get_headers(&self) -> HashMap<String, String> {
-        self.headers
     }
 
     #[inline]
@@ -44,11 +43,16 @@ impl Response {
 
 impl From<&str> for Response {
     fn from(resp: &str) -> Self {
+        let mut headers: HashMap<String, String> = HashMap::new();
+        headers.insert("Server".into(), "serve".into());
+        headers.insert("X-Powered-By".into(), "serve".into());
+        headers.insert("Connection".into(), "keep-alive".into());
+
         Response {
             response_code: 200,
             response_code_name: "OK".into(),
             http_version: HttpVersion::Ver11,
-            headers: HashMap::new(),
+            headers,
             body: resp.to_string(),
         }
     }
@@ -56,6 +60,12 @@ impl From<&str> for Response {
 
 impl Into<String> for Response {
     fn into(self) -> String {
+        self.to_string()
+    }
+}
+
+impl Display for Response {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let info = format!(
             "HTTP/{} {} {}",
             String::from(self.http_version),
@@ -66,14 +76,13 @@ impl Into<String> for Response {
         let headers = {
             let mut headers = String::new();
 
-            for (header, value) in self.headers {
+            for (header, value) in self.headers.iter() {
                 headers.push_str(format!("{}: {}\r\n", header, value).as_str());
             }
 
-            headers = headers.trim_end().to_string();
-            headers
+            headers.trim_end().to_string()
         };
 
-        format!("{}\r\n{}\r\n\r\n{}", info, headers, self.body)
+        write!(f, "{}\r\n{}\r\n\r\n{}", info, headers, self.body)
     }
 }
