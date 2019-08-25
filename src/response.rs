@@ -3,6 +3,8 @@ use std::{
     convert::{From, Into},
 };
 
+use crate::HttpVersion;
+
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Response {
@@ -11,6 +13,33 @@ pub struct Response {
     http_version: HttpVersion,
     headers: HashMap<String, String>,
     body: String,
+}
+
+impl Response {
+    #[inline]
+    pub fn get_response_code(&self) -> u16 {
+        self.response_code
+    }
+
+    #[inline]
+    pub fn get_response_code_name(&self) -> String {
+        self.response_code_name
+    }
+
+    #[inline]
+    pub fn get_http_version(&self) -> HttpVersion {
+        self.http_version
+    }
+
+    #[inline]
+    pub fn get_headers(&self) -> HashMap<String, String> {
+        self.headers
+    }
+
+    #[inline]
+    pub fn get_header(&self, key: String) -> std::option::Option<&String> {
+        self.headers.get(&key)
+    }
 }
 
 impl From<&str> for Response {
@@ -46,26 +75,5 @@ impl Into<String> for Response {
         };
 
         format!("{}\r\n{}\r\n\r\n{}", info, headers, self.body)
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Debug)]
-enum HttpVersion {
-    Ver1,
-    Ver11,
-    Ver2,
-}
-
-use HttpVersion::*;
-
-impl From<HttpVersion> for String {
-    fn from(ver: HttpVersion) -> Self {
-        match ver {
-            Ver1 => "1.0",
-            Ver11 => "1.1",
-            Ver2 => "2.0",
-        }
-        .into()
     }
 }
