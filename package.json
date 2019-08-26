@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "husky": "^3.0.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "cargo fmt"
+    }
+  }
+}

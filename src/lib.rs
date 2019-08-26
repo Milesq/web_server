@@ -9,8 +9,9 @@ pub use http_code::HttpCode;
 pub use http_route::{HttpMethod, HttpRoute};
 use http_version::HttpVersion;
 pub use response::Response;
+// pub use request::Request;
 pub use server::HttpServer;
 
-// pub fn new() -> HttpServer {
-//     HttpServer::new()
-// }
+pub fn new() -> HttpServer {
+    HttpServer::new()
+}

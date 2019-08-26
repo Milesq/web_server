@@ -21,12 +21,12 @@ impl Display for HttpCode {
                 HttpCode::_110 => "Connection Timed Out",
                 HttpCode::_111 => "Connection refused",
                 HttpCode::_200 => "OK",
-                HttpCode::_301 => "",
-                HttpCode::_302 => "",
-                HttpCode::_310 => "",
-                HttpCode::_400 => "",
-                HttpCode::_404 => "",
-                HttpCode::_500 => "",
+                HttpCode::_301 => "Moved Permanently",
+                HttpCode::_302 => "Found",
+                HttpCode::_310 => "Too many redirects",
+                HttpCode::_400 => "Bad Request",
+                HttpCode::_404 => "Not Found",
+                HttpCode::_500 => "Internal Server Error",
             }
             .to_string()
         )

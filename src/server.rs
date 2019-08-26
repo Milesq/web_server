@@ -17,8 +17,8 @@ pub struct HttpServer {
 }
 
 impl HttpServer {
-    pub fn new() -> HttpServer {
-        HttpServer { ..Default::default()}
+    pub fn new() -> Self {
+        Default::default()
     }
 
     pub fn route(
