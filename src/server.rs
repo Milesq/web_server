@@ -64,15 +64,13 @@ impl HttpServer {
 
         for stream in server.incoming() {
             let mut stream = stream?;
-            let received = read_to_string(&mut stream)?;
-            println!("{}\n\n\n", received);
-            let received = Request::try_from(received);
-            println!("{:?}\n\n\n", received);
+            let received = Request::try_from(read_to_string(&mut stream)?);
 
             let resp = if received.is_err() {
-                let mut resp = Response::new();
-                resp.response_code = HttpCode::_400;
-                resp
+                Response {
+                    response_code: HttpCode::_400,
+                    ..Response::new()
+                }
             } else if let Ok(req) = received {
                 self.routes[0].1(req, Response::new())
             } else {
