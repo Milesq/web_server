@@ -53,17 +53,17 @@ impl TryFrom<String> for Request {
 
             let method = info[0].parse::<HttpMethod>();
 
-            if let Err(_) = method {
+            if method.is_err() {
                 return Err(());
             }
 
             let http_version = http_ver(info[2]);
-            if let None = http_version {
+            if http_version.is_none() {
                 return Err(());
             }
 
             let headers = parse_headers(headers);
-            if let None = headers {
+            if headers.is_none() {
                 return Err(());
             }
 
@@ -95,7 +95,7 @@ fn split_http_request(req: String) -> Option<[String; 3]> {
 
     let body: String = lines.collect();
 
-    Some([info.into(), headers.into(), body.into()])
+    Some([info.into(), headers, body])
 }
 
 fn parse_headers(headers: String) -> Option<HashMap<String, String>> {
@@ -107,9 +107,7 @@ fn parse_headers(headers: String) -> Option<HashMap<String, String>> {
         while next_char != ':' {
             let tmp = s.next();
 
-            if let None = tmp {
-                return None;
-            }
+            tmp?;
 
             next_char = tmp.unwrap();
             key.push(next_char);
@@ -125,9 +123,7 @@ fn parse_headers(headers: String) -> Option<HashMap<String, String>> {
     for line in headers.lines() {
         let data = parse_header(line.to_string());
 
-        if let None = data {
-            return None;
-        }
+        data.as_ref()?;
 
         let data = data.unwrap();
 

@@ -69,7 +69,7 @@ impl HttpServer {
             let received = Request::try_from(received);
             println!("{:?}\n\n\n", received);
 
-            let resp = if let Err(_) = received {
+            let resp = if received.is_err() {
                 let mut resp = Response::new();
                 resp.response_code = HttpCode::_400;
                 resp
