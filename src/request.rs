@@ -8,7 +8,8 @@ pub struct Request {
     method: HttpMethod,
     path: String,
     http_version: HttpVersion,
-    headers: HashMap<String, String>,
+    pub headers: HashMap<String, String>,
+    pub params: HashMap<String, String>,
     body: String,
 }
 
@@ -27,11 +28,6 @@ impl Request {
     #[inline]
     pub fn get_http_version(&self) -> HttpVersion {
         self.http_version
-    }
-
-    #[inline]
-    pub fn get_header(&self, key: String) -> std::option::Option<&String> {
-        self.headers.get(&key)
     }
 
     #[inline]
@@ -72,6 +68,7 @@ impl TryFrom<String> for Request {
                 path: info[1].to_string(),
                 http_version: http_version.unwrap(),
                 headers: headers.unwrap(),
+                params: HashMap::new(),
                 body,
             })
         } else {

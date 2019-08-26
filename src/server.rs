@@ -1,6 +1,7 @@
 use crate::{HttpCode, HttpMethod, Request, Response};
 use std::convert::TryFrom;
 use std::{
+    collections::HashMap,
     io::{self, Read, Write},
     net::{self, TcpListener},
 };
@@ -71,8 +72,21 @@ impl HttpServer {
                     response_code: HttpCode::_400,
                     ..Response::new()
                 }
-            } else if let Ok(req) = received {
-                self.routes[0].1(req, Response::new())
+            } else if let Ok(mut req) = received {
+                let mut resp = Response::new();
+
+                for route in self.routes.iter() {
+                    let (routes_matches, params) =
+                        matches_to_route(route.0.route.clone(), req.get_path());
+
+                    if route.0.method == req.get_method() && routes_matches {
+                        req.params = params;
+                        resp = route.1(req, Response::new());
+                        break;
+                    }
+                }
+
+                resp
             } else {
                 Response::new()
             };
@@ -109,4 +123,28 @@ fn read_all(readable: &mut impl Read) -> io::Result<Vec<u8>> {
     }
 
     Ok(total)
+}
+
+fn matches_to_route(route: String, path: String) -> (bool, HashMap<String, String>) {
+    let route = route.split('/').filter(|el| el != &"");
+    let path = path.split('/').filter(|el| el != &"");
+
+    if route.clone().count() != path.clone().count() {
+        return (false, HashMap::new());
+    }
+
+    let mut params: HashMap<String, String> = HashMap::new();
+
+    for el in path.zip(route) {
+        let (path, route) = el;
+        if &route[..1] != ":" {
+            if path != route {
+                return (false, HashMap::new());
+            }
+        } else {
+            params.insert(route[1..].to_string(), path.to_string());
+        }
+    }
+
+    (true, params)
 }

@@ -4,8 +4,10 @@ extern crate http_server;
 
 fn main() {
     http_server::new()
-        .get("/stats/:num", |_, _| "ok2".into())
-        .post("/stats", |_, _| "ok".into())
+        .get("/ok/my/wer", |_, _| "ok2".into())
+        .get("/ok/:parameter/:p", |req, _| {
+            format!("{:#?}", req.params).as_str().into()
+        })
         .launch(8080)
         .unwrap();
 }

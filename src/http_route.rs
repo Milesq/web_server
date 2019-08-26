@@ -4,7 +4,7 @@ pub struct HttpRoute {
     pub route: String,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 #[allow(dead_code)]
 pub enum HttpMethod {
     GET,
