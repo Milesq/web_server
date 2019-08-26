@@ -4,8 +4,8 @@ extern crate http_server;
 
 fn main() {
     http_server::new()
-        .get("/stats/:num", || "ok".into())
-        .post("/stats", || "ok".into())
+        .get("/stats/:num", |_, _| "ok2".into())
+        .post("/stats", |_, _| "ok".into())
         .launch(8080)
         .unwrap();
 }

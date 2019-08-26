@@ -74,7 +74,7 @@ impl Display for Response {
 
 fn get_code(code: HttpCode) -> i16 {
     let code = format!("{:?}", code);
-    let code: Vec<&str> = code.as_str().split("_").collect();
+    let code: Vec<&str> = code.as_str().split('_').collect();
 
     code[1].parse().unwrap()
 }

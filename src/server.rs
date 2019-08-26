@@ -1,10 +1,10 @@
-use crate::{http_route::HttpMethod, response::Response};
+use crate::{http_route::HttpMethod, Request, Response};
 use std::{
     io::{self, Read, Write},
     net::{self, TcpListener},
 };
 
-type RequestHandler = fn() -> Response;
+type RequestHandler = fn(Request, Response) -> Response;
 
 // first parameter = http path + http method
 // second parameter = function handler
@@ -63,11 +63,9 @@ impl HttpServer {
         for stream in server.incoming() {
             let mut stream = stream?;
 
-            let _received = read_to_string(&mut stream);
-            // println!("{}", received?);
+            let received = read_to_string(&mut stream);
 
-            let resp = Response::from("ok");
-            println!("{}", resp);
+            let resp = self.routes[0].1(Request::from(received?), Response::new());
 
             stream.write_all(resp.to_string().as_bytes())?;
 

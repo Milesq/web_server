@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-
 use crate::{HttpCode, HttpVersion};
+use std::collections::HashMap;
+use std::convert::From;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -31,5 +31,16 @@ impl Request {
     #[inline]
     pub fn get_body(&self) -> String {
         self.body.clone()
+    }
+}
+
+impl From<String> for Request {
+    fn from(req: String) -> Self {
+        Self {
+            response_code: HttpCode::_200,
+            http_version: HttpVersion::Ver11,
+            headers: Default::default(),
+            body: String::new(),
+        }
     }
 }
