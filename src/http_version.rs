@@ -20,3 +20,9 @@ impl From<HttpVersion> for String {
         .into()
     }
 }
+
+impl Default for HttpVersion {
+    fn default() -> Self {
+        Self::Ver11
+    }
+}

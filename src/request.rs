@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::HttpVersion;
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Request {
     response_code: u16,
     response_code_name: String,
@@ -12,6 +12,7 @@ pub struct Request {
     body: String,
 }
 
+// Access to fields
 impl Request {
     #[inline]
     pub fn get_response_code(&self) -> u16 {
@@ -36,5 +37,11 @@ impl Request {
     #[inline]
     pub fn get_body(&self) -> String {
         self.body.clone()
+    }
+}
+
+impl Request {
+    fn new() -> Self {
+        Default::default()
     }
 }
