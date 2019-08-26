@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 
-use crate::HttpVersion;
+use crate::{HttpCode, HttpVersion};
 
 #[allow(dead_code)]
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Request {
-    response_code: u16,
-    response_code_name: String,
+    response_code: HttpCode,
     http_version: HttpVersion,
     headers: HashMap<String, String>,
     body: String,
@@ -15,13 +14,8 @@ pub struct Request {
 // Access to fields
 impl Request {
     #[inline]
-    pub fn get_response_code(&self) -> u16 {
+    pub fn get_response_code(&self) -> HttpCode {
         self.response_code
-    }
-
-    #[inline]
-    pub fn get_response_code_name(&self) -> String {
-        self.response_code_name.clone()
     }
 
     #[inline]
@@ -37,11 +31,5 @@ impl Request {
     #[inline]
     pub fn get_body(&self) -> String {
         self.body.clone()
-    }
-}
-
-impl Request {
-    fn new() -> Self {
-        Default::default()
     }
 }

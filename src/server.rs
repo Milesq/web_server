@@ -63,10 +63,11 @@ impl HttpServer {
         for stream in server.incoming() {
             let mut stream = stream?;
 
-            let received = read_to_string(&mut stream);
-            println!("{}", received?);
+            let _received = read_to_string(&mut stream);
+            // println!("{}", received?);
 
             let resp = Response::from("ok");
+            println!("{}", resp);
 
             stream.write_all(resp.to_string().as_bytes())?;
 

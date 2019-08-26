@@ -4,13 +4,12 @@ use std::{
     fmt::{self, Display},
 };
 
-use crate::HttpVersion;
+use crate::{HttpCode, HttpVersion};
 
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Response {
-    pub response_code: u16,
-    pub response_code_name: String,
+    pub response_code: HttpCode,
     pub http_version: HttpVersion,
     pub headers: HashMap<String, String>,
     pub body: String,
@@ -36,8 +35,7 @@ impl From<&str> for Response {
         headers.insert("Connection".into(), "keep-alive".into());
 
         Response {
-            response_code: 200,
-            response_code_name: "OK".into(),
+            response_code: HttpCode::_200,
             http_version: HttpVersion::Ver11,
             headers,
             body: resp.to_string(),
@@ -56,8 +54,8 @@ impl Display for Response {
         let info = format!(
             "HTTP/{} {} {}",
             String::from(self.http_version),
-            self.response_code,
-            self.response_code_name
+            get_code(self.response_code),
+            self.response_code
         );
 
         let headers = {
@@ -72,4 +70,11 @@ impl Display for Response {
 
         write!(f, "{}\r\n{}\r\n\r\n{}", info, headers, self.body)
     }
+}
+
+fn get_code(code: HttpCode) -> i16 {
+    let code = format!("{:?}", code);
+    let code: Vec<&str> = code.as_str().split("_").collect();
+
+    code[1].parse().unwrap()
 }

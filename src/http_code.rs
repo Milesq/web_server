@@ -1,5 +1,6 @@
 use std::fmt::{self, Display};
 
+#[derive(Debug, Clone, Copy)]
 pub enum HttpCode {
     _110,
     _111,
