@@ -4,7 +4,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "cargo fmt"
+      "pre-commit": "cargo fmt && git add ."
     }
   }
 }
