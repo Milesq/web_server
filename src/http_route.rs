@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct HttpRoute {
     pub method: HttpMethod,
-    pub route: String
+    pub route: String,
 }
 
 #[derive(Debug)]
@@ -13,5 +13,5 @@ pub enum HttpMethod {
     PUT,
     DELETE,
     TRACE,
-    OPTIONS
+    OPTIONS,
 }

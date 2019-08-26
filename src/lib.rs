@@ -1,14 +1,15 @@
-mod http_version;
-mod server;
 mod http_route;
+mod http_version;
 mod response;
-mod request;
+mod server;
+// mod request;
+mod http_code;
 
+pub use http_code::HttpCode;
+pub use http_route::{HttpMethod, HttpRoute};
 use http_version::HttpVersion;
-pub use server::HttpServer;
-pub use http_route::{HttpRoute, HttpMethod};
 pub use response::Response;
-pub use request::Request;
+pub use server::HttpServer;
 
 pub fn new() -> HttpServer {
     HttpServer::new()

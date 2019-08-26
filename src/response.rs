@@ -1,10 +1,7 @@
 use std::{
     collections::HashMap,
     convert::{From, Into},
-    fmt::{
-        self,
-        Display
-    }
+    fmt::{self, Display},
 };
 
 use crate::HttpVersion;
@@ -12,31 +9,20 @@ use crate::HttpVersion;
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Response {
-    response_code: u16,
-    response_code_name: String,
-    http_version: HttpVersion,
-    headers: HashMap<String, String>,
-    body: String,
+    pub response_code: u16,
+    pub response_code_name: String,
+    pub http_version: HttpVersion,
+    pub headers: HashMap<String, String>,
+    pub body: String,
 }
 
 impl Response {
-    #[inline]
-    pub fn get_response_code(&self) -> u16 {
-        self.response_code
+    pub fn new() -> Self {
+        "".into()
     }
 
     #[inline]
-    pub fn get_response_code_name(&self) -> String {
-        self.response_code_name.clone()
-    }
-
-    #[inline]
-    pub fn get_http_version(&self) -> HttpVersion {
-        self.http_version
-    }
-
-    #[inline]
-    pub fn get_header(&self, key: String) -> std::option::Option<&String> {
+    pub fn header(&self, key: String) -> std::option::Option<&String> {
         self.headers.get(&key)
     }
 }

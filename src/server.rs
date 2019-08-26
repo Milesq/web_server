@@ -1,17 +1,7 @@
+use crate::{http_route::HttpMethod, response::Response};
 use std::{
-    net::{
-        self,
-        TcpListener
-    },
-    io::{
-        self,
-        Read,
-        Write
-    }
-};
-use crate::{
-    http_route::HttpMethod,
-    response::Response
+    io::{self, Read, Write},
+    net::{self, TcpListener},
 };
 
 type RequestHandler = fn() -> Response;
@@ -23,7 +13,7 @@ struct HttpHandler(crate::HttpRoute, RequestHandler);
 
 #[derive(Debug)]
 pub struct HttpServer {
-    routes: Vec<HttpHandler>
+    routes: Vec<HttpHandler>,
 }
 
 impl HttpServer {
@@ -37,27 +27,22 @@ impl HttpServer {
         path: &'static str,
         handler: RequestHandler,
     ) -> Self {
-        self.routes.push(HttpHandler(crate::HttpRoute {
-            method: method,
-            route: path.to_string()
-        }, handler));
+        self.routes.push(HttpHandler(
+            crate::HttpRoute {
+                method: method,
+                route: path.to_string(),
+            },
+            handler,
+        ));
 
         self
     }
 
-    pub fn get(
-        self,
-        path: &'static str,
-        handler: RequestHandler,
-    ) -> Self {
+    pub fn get(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::GET, path, handler)
     }
 
-    pub fn post(
-        self,
-        path: &'static str,
-        handler: RequestHandler,
-    ) -> Self {
+    pub fn post(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::POST, path, handler)
     }
 }
@@ -68,7 +53,11 @@ impl HttpServer {
     }
 
     pub fn launch(self, port: i32) -> io::Result<()> {
-        let ip = if cfg!(debug_assertions) { "localhost" } else { "0.0.0.0" };
+        let ip = if cfg!(debug_assertions) {
+            "localhost"
+        } else {
+            "0.0.0.0"
+        };
         let server = TcpListener::bind(format!("{}:{}", ip, port).as_str())?;
 
         for stream in server.incoming() {
@@ -77,9 +66,9 @@ impl HttpServer {
             let received = read_to_string(&mut stream);
             println!("{}", received?);
 
-        let resp = Response::from("ok");
+            let resp = Response::from("ok");
 
-        stream.write(resp.to_string().as_bytes())?;
+            stream.write(resp.to_string().as_bytes())?;
 
             stream.shutdown(net::Shutdown::Both)?;
         }
