@@ -11,6 +11,6 @@ use http_version::HttpVersion;
 pub use response::Response;
 pub use server::HttpServer;
 
-pub fn new() -> HttpServer {
-    HttpServer::new()
-}
+// pub fn new() -> HttpServer {
+//     HttpServer::new()
+// }

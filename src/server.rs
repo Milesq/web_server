@@ -11,14 +11,14 @@ type RequestHandler = fn() -> Response;
 #[derive(Debug)]
 struct HttpHandler(crate::HttpRoute, RequestHandler);
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct HttpServer {
     routes: Vec<HttpHandler>,
 }
 
 impl HttpServer {
     pub fn new() -> HttpServer {
-        HttpServer { routes: Vec::new() }
+        HttpServer { ..Default::default()}
     }
 
     pub fn route(
@@ -29,7 +29,7 @@ impl HttpServer {
     ) -> Self {
         self.routes.push(HttpHandler(
             crate::HttpRoute {
-                method: method,
+                method,
                 route: path.to_string(),
             },
             handler,
@@ -68,7 +68,7 @@ impl HttpServer {
 
             let resp = Response::from("ok");
 
-            stream.write(resp.to_string().as_bytes())?;
+            stream.write_all(resp.to_string().as_bytes())?;
 
             stream.shutdown(net::Shutdown::Both)?;
         }

@@ -16,6 +16,7 @@ pub struct Response {
     pub body: String,
 }
 
+#[allow(clippy::new_without_default)]
 impl Response {
     pub fn new() -> Self {
         "".into()
