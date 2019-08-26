@@ -15,7 +15,7 @@ mod tests {
     #[test]
     fn simple_server() {
         http_server::new()
-            .get("/stats/:num", || "ok".into())
-            .post("/stats", || "ok".into());
+            .get("/stats/:num", |_, _| "ok".into())
+            .post("/stats", |_, _| "ok".into());
     }
 }
