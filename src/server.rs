@@ -1,4 +1,5 @@
-use crate::{http_route::HttpMethod, Request, Response};
+use crate::{HttpCode, HttpMethod, Request, Response};
+use std::convert::TryFrom;
 use std::{
     io::{self, Read, Write},
     net::{self, TcpListener},
@@ -58,17 +59,27 @@ impl HttpServer {
         } else {
             "0.0.0.0"
         };
+
         let server = TcpListener::bind(format!("{}:{}", ip, port).as_str())?;
 
         for stream in server.incoming() {
             let mut stream = stream?;
+            let received = read_to_string(&mut stream)?;
+            println!("{}\n\n\n", received);
+            let received = Request::try_from(received);
+            println!("{:?}\n\n\n", received);
 
-            let received = read_to_string(&mut stream);
-
-            let resp = self.routes[0].1(Request::from(received?), Response::new());
+            let resp = if let Err(_) = received {
+                let mut resp = Response::new();
+                resp.response_code = HttpCode::_400;
+                resp
+            } else if let Ok(req) = received {
+                self.routes[0].1(req, Response::new())
+            } else {
+                Response::new()
+            };
 
             stream.write_all(resp.to_string().as_bytes())?;
-
             stream.shutdown(net::Shutdown::Both)?;
         }
 
