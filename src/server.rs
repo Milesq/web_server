@@ -13,9 +13,22 @@ type RequestHandler = fn(Request, Response) -> Response;
 #[derive(Debug)]
 struct HttpHandler(crate::HttpRoute, RequestHandler);
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct HttpServer {
     routes: Vec<HttpHandler>,
+    not_found_handler: RequestHandler,
+}
+
+impl Default for HttpServer {
+    fn default() -> Self {
+        Self {
+            routes: Vec::new(),
+            not_found_handler: |_, mut default_resp| {
+                default_resp.response_code = HttpCode::_404;
+                default_resp
+            },
+        }
+    }
 }
 
 impl HttpServer {
@@ -50,6 +63,11 @@ impl HttpServer {
 
     pub fn any(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::Any, path, handler)
+    }
+
+    pub fn not_found(mut self, handler: RequestHandler) -> Self {
+        self.not_found_handler = handler;
+        self
     }
 }
 

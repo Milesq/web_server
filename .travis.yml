@@ -6,6 +6,7 @@ cache: cargo
 script:
     - cargo test
     - cargo test --example=simple_server
+    - cargo test --example=404_handler
 
 notifications:
   email:
