@@ -96,6 +96,7 @@ impl HttpServer {
                 },
                 Ok(mut req) => {
                     let mut resp = Response::new();
+                    let mut matched_route: bool = false;
 
                     for route in self.routes.iter() {
                         let (routes_matches, params) =
@@ -105,9 +106,14 @@ impl HttpServer {
                             && routes_matches
                         {
                             req.params = params;
-                            resp = route.1(req, Response::new());
+                            resp = route.1(req.clone(), Response::new());
+                            matched_route = true;
                             break;
                         }
+                    }
+
+                    if !matched_route {
+                        resp = (self.not_found_handler)(req.clone(), Response::new());
                     }
 
                     resp
