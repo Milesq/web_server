@@ -89,30 +89,29 @@ impl HttpServer {
             let mut stream = stream?;
             let received = Request::try_from(read_to_string(&mut stream)?);
 
-            let resp = if received.is_err() {
-                Response {
+            let resp = match received {
+                Err(_) => Response {
                     response_code: HttpCode::_400,
                     ..Response::new()
-                }
-            } else if let Ok(mut req) = received {
-                let mut resp = Response::new();
+                },
+                Ok(mut req) => {
+                    let mut resp = Response::new();
 
-                for route in self.routes.iter() {
-                    let (routes_matches, params) =
-                        matches_to_route(route.0.route.clone(), req.get_path());
+                    for route in self.routes.iter() {
+                        let (routes_matches, params) =
+                            matches_to_route(route.0.route.clone(), req.get_path());
 
-                    if (route.0.method == req.get_method() || route.0.method == HttpMethod::Any)
-                        && routes_matches
-                    {
-                        req.params = params;
-                        resp = route.1(req, Response::new());
-                        break;
+                        if (route.0.method == req.get_method() || route.0.method == HttpMethod::Any)
+                            && routes_matches
+                        {
+                            req.params = params;
+                            resp = route.1(req, Response::new());
+                            break;
+                        }
                     }
-                }
 
-                resp
-            } else {
-                Response::new()
+                    resp
+                }
             };
 
             stream.write_all(resp.to_string().as_bytes())?;
