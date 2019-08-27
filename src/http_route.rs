@@ -14,6 +14,7 @@ pub enum HttpMethod {
     DELETE,
     TRACE,
     OPTIONS,
+    Any,
 }
 
 impl std::str::FromStr for HttpMethod {

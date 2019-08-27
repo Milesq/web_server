@@ -47,6 +47,10 @@ impl HttpServer {
     pub fn post(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::POST, path, handler)
     }
+
+    pub fn any(self, path: &'static str, handler: RequestHandler) -> Self {
+        self.route(HttpMethod::Any, path, handler)
+    }
 }
 
 impl HttpServer {
@@ -79,7 +83,9 @@ impl HttpServer {
                     let (routes_matches, params) =
                         matches_to_route(route.0.route.clone(), req.get_path());
 
-                    if route.0.method == req.get_method() && routes_matches {
+                    if (route.0.method == req.get_method() || route.0.method == HttpMethod::Any)
+                        && routes_matches
+                    {
                         req.params = params;
                         resp = route.1(req, Response::new());
                         break;
