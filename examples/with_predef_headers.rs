@@ -1,7 +1,7 @@
-extern crate http_server;
+extern crate web_server;
 
-use http_server::Response;
 use std::collections::HashMap;
+use web_server::Response;
 
 fn main() {
     let mut headers = HashMap::new();
@@ -12,7 +12,7 @@ fn main() {
         .."".into()
     };
 
-    http_server::create_server(default_response)
+    web_server::create_server(default_response)
         .get("/", |_, _| "It can be fetched from browser by AJAX!".into())
         .launch(8080)
         .unwrap();

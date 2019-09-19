@@ -1,8 +1,12 @@
 [package]
-name = "http_server"
+name = "web_server"
 version = "0.1.0"
+description = "Small and dependency-less crate for creating HTTP servers"
 authors = ["Milesq <wmilosz88@gmail.com>"]
 edition = "2018"
+license = "MIT"
+homepage = "https://github.com/Milesq/web_server"
+repository = "https://github.com/Milesq/web_server"
 
 [badges.travis-ci]
-repository = "Milesq/http_server"
+repository = "Milesq/web_server"

@@ -1,7 +1,7 @@
-extern crate http_server;
+extern crate web_server;
 
 fn main() {
-    http_server::new()
+    web_server::new()
         .get("/user/:id", |request, _| {
             format!("{:?}", request.params.get("id")).into()
         })
@@ -13,7 +13,7 @@ fn main() {
 mod tests {
     #[test]
     fn simple_server() {
-        http_server::new()
+        web_server::new()
             .get("/stats/:num", |_, _| "ok".into())
             .post("/stats/:num", |_, _| "ok".into())
             .any("/stats/:num", |_, _| "ok".into());
