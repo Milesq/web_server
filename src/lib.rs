@@ -1,8 +1,3 @@
-//! lib documentation
-//! example:
-//! ```
-//! let x = factorial(3);
-//! ```
 mod http_code;
 mod http_route;
 mod http_version;

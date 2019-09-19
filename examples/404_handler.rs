@@ -7,7 +7,9 @@ fn main() {
         .get("/foo/:parameter", |req, _| {
             format!("{:#?}", req.params).as_str().into()
         })
-        .any("/ok/my/wer", |_, _| "any".into())
+        .any("/foo/bar/foobar", |_, _| {
+            "Like First handler, but any http method".into()
+        })
         .launch(8080)
         .unwrap();
 }
