@@ -16,3 +16,10 @@ pub use server::HttpServer;
 pub fn new() -> HttpServer {
     HttpServer::new()
 }
+
+// Create new instance of HttpServer with predefined body
+pub fn create_server(default_repsonse: Response) -> HttpServer {
+    let mut ret = HttpServer::new();
+    ret.default_repsonse = default_repsonse;
+    ret
+}

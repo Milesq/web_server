@@ -1,16 +1,19 @@
-// extern crate http_server;
-// use std::collections::HashMap;
+extern crate http_server;
 
-// fn handler(req: http_server::Request, resp: http_server::Response) -> http_server::Response {
-//     write!(resp, "ok");
-// }
+use http_server::Response;
+use std::collections::HashMap;
 
 fn main() {
-    println!("Ok");
-    // let mut headers = HashMap::new();
-    // headers.insert("Access-Control-Allow-Origin", "*");
+    let mut headers = HashMap::new();
+    headers.insert("Access-Control-Allow-Origin".to_string(), "*".to_string());
 
-    // http_server::create_server(headers)
-    //     .get("/", handler)
-    //     .launch(8080);
+    let default_response = Response {
+        headers,
+        .."".into()
+    };
+
+    http_server::create_server(default_response)
+        .get("/", |_, _| "It can be fetched from browser by AJAX!".into())
+        .launch(8080)
+        .unwrap();
 }

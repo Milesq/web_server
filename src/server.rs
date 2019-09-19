@@ -19,6 +19,7 @@ struct HttpHandler(crate::HttpRoute, RequestHandler);
 pub struct HttpServer {
     routes: Vec<HttpHandler>,
     not_found_handler: RequestHandler,
+    pub(crate) default_repsonse: Response,
 }
 
 impl Default for HttpServer {
@@ -29,6 +30,7 @@ impl Default for HttpServer {
                 default_resp.response_code = HttpCode::_404;
                 default_resp
             },
+            default_repsonse: Response::new(),
         }
     }
 }
@@ -131,7 +133,7 @@ impl HttpServer {
                     ..Response::new()
                 },
                 Ok(mut req) => {
-                    let mut resp = Response::new();
+                    let mut resp = self.default_repsonse.clone();
                     let mut matched_route: bool = false;
 
                     for route in self.routes.iter() {
