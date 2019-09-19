@@ -8,7 +8,7 @@ fn main() {
             format!("{:#?}", req.params).as_str().into()
         })
         .any("/foo/bar/foobar", |_, _| {
-            "Like First handler, but any http method".into()
+            "Like First handler but any http method".into()
         })
         .launch(8080)
         .unwrap();
