@@ -1,3 +1,8 @@
+/// lib documentation
+/// example:
+/// ```
+/// let x = factorial(3);
+/// ```
 mod http_code;
 mod http_route;
 mod http_version;
@@ -12,6 +17,7 @@ pub use request::Request;
 pub use response::Response;
 pub use server::HttpServer;
 
+/// Create new instance of HttpServer
 pub fn new() -> HttpServer {
     HttpServer::new()
 }

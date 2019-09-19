@@ -8,6 +8,7 @@ use crate::{HttpCode, HttpVersion};
 
 #[allow(dead_code)]
 #[derive(Debug)]
+/// Represents http request
 pub struct Response {
     pub response_code: HttpCode,
     pub http_version: HttpVersion,

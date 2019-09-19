@@ -14,6 +14,8 @@ type RequestHandler = fn(Request, Response) -> Response;
 struct HttpHandler(crate::HttpRoute, RequestHandler);
 
 #[derive(Debug)]
+/// Storing basics informations about server and handlers
+/// Represents http server
 pub struct HttpServer {
     routes: Vec<HttpHandler>,
     not_found_handler: RequestHandler,
@@ -32,10 +34,12 @@ impl Default for HttpServer {
 }
 
 impl HttpServer {
+    /// Create new instance of HttpServer
     pub fn new() -> Self {
         Default::default()
     }
 
+    /// Add a route for a specific path and method
     pub fn route(
         mut self,
         method: HttpMethod,
@@ -53,18 +57,44 @@ impl HttpServer {
         self
     }
 
+    /// Add a route for GET method and a specific path
+    /// ```
+    /// server.get("/user/:id", |request, _| {
+    ///     database.get_user(request.params.get("id").unwrap()).into()
+    /// })
+    /// ```
     pub fn get(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::GET, path, handler)
     }
 
+    /// Add a route for POST method and a specific path
+    /// ```
+    /// server.post("/add-user", |request, mut default_response| {
+    ///     println!("Save new user!\n\n{}", request.get_body());
+    ///
+    ///     default_response.headers.insert("Access-Control-Allow-Origin", "*");
+    ///     default_repsonse
+    /// })
+    /// ```
     pub fn post(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::POST, path, handler)
     }
 
+    /// Add a route for a specific path and any method
+    /// ```
+    /// server
+    ///     .get("/endpoint", |request, default_response| "Gate GET were obtained".into())
+    ///     .post("/endpoint", |request, default_response| "Gate POST were obtained".into())
+    ///     .any("/endpoint", |request, default_response| "Another gate were obtained".into())
+    /// ```
     pub fn any(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::Any, path, handler)
     }
 
+    /// Add a handler for 404 error
+    /// ```
+    // / server.not_found(|_, _| "Not found!".into());
+    /// ```
     pub fn not_found(mut self, handler: RequestHandler) -> Self {
         self.not_found_handler = handler;
         self
@@ -72,10 +102,16 @@ impl HttpServer {
 }
 
 impl HttpServer {
+    /// Launch server on port 80
     pub fn run(self) -> io::Result<()> {
         self.launch(80)
     }
 
+    /// Lauch http server, never returns
+
+    /// ```
+    /// server.launch(8080).unwrap();
+    /// ```
     pub fn launch(self, port: i32) -> io::Result<()> {
         let ip = if cfg!(debug_assertions) {
             "localhost"

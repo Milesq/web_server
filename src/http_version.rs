@@ -2,6 +2,7 @@
 #[derive(Debug, Clone, Copy)]
 // When crate modifier will be stable
 // this can be change to ```crate enum ...```
+/// Represents supported versions of HTTP
 pub enum HttpVersion {
     Ver1,
     Ver11,

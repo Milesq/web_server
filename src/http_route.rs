@@ -1,4 +1,5 @@
 #[derive(Debug)]
+/// Storing http methods and path
 pub struct HttpRoute {
     pub method: HttpMethod,
     pub route: String,
@@ -6,6 +7,7 @@ pub struct HttpRoute {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 #[allow(dead_code)]
+/// Represents http's methods
 pub enum HttpMethod {
     GET,
     HEAD,

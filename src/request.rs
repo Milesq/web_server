@@ -4,6 +4,7 @@ use std::convert::TryFrom;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
+/// Represents http request
 pub struct Request {
     method: HttpMethod,
     path: String,
