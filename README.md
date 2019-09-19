@@ -2,14 +2,14 @@
 
 [![Build Status](https://travis-ci.com/Milesq/web_server.svg?branch=master)](https://travis-ci.com/Milesq/web_server)
 
-# web_server is a small, dependency-less crate for creating HTTP servers.
+## web_server is a small, dependency-less crate for creating HTTP servers.
 
-## When you coding the backend using Rust, the most annoying thing could be the size of a freamwork and the time needed to compile the application
+### When you coding the backend using Rust, the most annoying thing could be the size of a freamwork and the time needed to compile the application
 
-## The web_server package fixes these problems. web_server has no dependencies, but allows you to create full-fledged servers
+### The web_server package fixes these problems. web_server has no dependencies, but allows you to create full-fledged servers
 
 
-### First server using web_server
+#### First server using web_server
 
 ```rust
 extern crate web_server;
@@ -20,13 +20,13 @@ web_server::new()
    .unwrap();
 ```
 
-### It's easy!
-### First you must create instance of HttpServer
+#### It's easy!
+#### First you must create instance of HttpServer
 
 ```rust
 web_server::new()
 ```
-### then you can declare your endpoints. E.g.
+#### then you can declare your endpoints. E.g.
 
 ```rust
 .get("/your/path", |request, default_response| {
@@ -39,7 +39,7 @@ web_server::new()
 .any("/your/path", |_, _| "Handler for any method")
 ```
 
-### Now you must run server by launch method
+#### Now you must run server by launch method
 ```rust
 .launch(PORT).unwrap()
 ```
