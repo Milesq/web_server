@@ -10,4 +10,4 @@ repository = "https://github.com/Milesq/web_server"
 readme = "README.md"
 
 [badges.travis-ci]
-repository = "Milesq/web_server"
+repository = "Milesq/http_server"
