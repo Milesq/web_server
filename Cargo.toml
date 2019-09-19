@@ -3,3 +3,6 @@ name = "http_server"
 version = "0.1.0"
 authors = ["Milesq <wmilosz88@gmail.com>"]
 edition = "2018"
+
+[badges.travis-ci]
+repository = "Milesq/http_server"
