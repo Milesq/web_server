@@ -60,7 +60,7 @@ impl HttpServer {
     }
 
     /// Add a route for GET method and a specific path
-    /// ```ignore
+    /// ```
     /// server.get("/user/:id", |request, _| {
     ///     database.get_user(request.params.get("id").unwrap()).into()
     /// })
@@ -70,7 +70,7 @@ impl HttpServer {
     }
 
     /// Add a route for POST method and a specific path
-    /// ```ignore
+    /// ```
     /// server.post("/add-user", |request, mut default_response| {
     ///     println!("Save new user!\n\n{}", request.get_body());
     ///
@@ -83,7 +83,7 @@ impl HttpServer {
     }
 
     /// Add a route for a specific path and any method
-    /// ```ignore
+    /// ```
     /// server
     ///     .get("/endpoint", |request, default_response| "Gate GET were obtained".into())
     ///     .post("/endpoint", |request, default_response| "Gate POST were obtained".into())
@@ -94,7 +94,7 @@ impl HttpServer {
     }
 
     /// Add a handler for 404 error
-    /// ```ignore
+    /// ```
     /// server.not_found(|_, _| "Not found!".into());
     /// ```
     pub fn not_found(mut self, handler: RequestHandler) -> Self {
@@ -111,7 +111,7 @@ impl HttpServer {
 
     /// Lauch http server, never returns
 
-    /// ```ignore
+    /// ```
     /// server.launch(8080).unwrap();
     /// ```
     pub fn launch(self, port: i32) -> io::Result<()> {
