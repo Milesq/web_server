@@ -21,6 +21,7 @@ mod tests {
         http_server::new()
             .get("/stats/:num", |_, _| "ok".into())
             .post("/stats/:num", |_, _| "ok".into())
-            .any("/stats/:num", |_, _| "ok".into());
+            .any("/stats/:num", |_, _| "ok".into())
+            .not_found(|_, _| "Not Found!!!".into());
     }
 }
