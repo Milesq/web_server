@@ -11,8 +11,7 @@ fn main() {
     //     .unwrap();
     http_server::new()
         .get("/user/:id", |request, _| {
-            // "ok".into()
-            format!("{:?}", request.params.get("id"))
+            format!("{:?}", request.params.get("id")).into()
         })
         .launch(8080)
         .unwrap();

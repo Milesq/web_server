@@ -44,6 +44,12 @@ impl From<&str> for Response {
     }
 }
 
+impl From<String> for Response {
+    fn from(resp: String) -> Self {
+        resp.as_str().into()
+    }
+}
+
 impl Into<String> for Response {
     fn into(self) -> String {
         self.to_string()
