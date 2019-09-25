@@ -44,7 +44,7 @@ impl TryFrom<String> for Request {
     fn try_from(req: String) -> Result<Self, Self::Error> {
         if let Some([info, headers, body]) = split_http_request(req) {
             let info: Vec<&str> = info.split(' ').collect();
-            let query = x_www_form_urlencoded(info[1]);
+            let query = get_query(info[1]);
 
             if info.len() != 3 {
                 return Err(());
@@ -143,15 +143,20 @@ fn http_ver(s: &str) -> Option<HttpVersion> {
     }
 }
 
-pub fn x_www_form_urlencoded(path: &str) -> HashMap<String, String> {
+fn get_query(path: &str) -> HashMap<String, String> {
     let query: Vec<&str> = path.split('?').collect();
-    let mut ret = HashMap::new();
 
     if query.len() == 1 {
         return HashMap::new();
     }
 
-    for el in query[1].split('&') {
+    x_www_form_urlencoded(query[1])
+}
+
+pub fn x_www_form_urlencoded(path: &str) -> HashMap<String, String> {
+    let mut ret = HashMap::new();
+
+    for el in path.split('&') {
         let parameter = el.split('=').collect::<Vec<&str>>();
         ret.insert(parameter[0].to_string(), parameter[1].to_string());
     }
