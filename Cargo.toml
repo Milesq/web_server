@@ -1,6 +1,6 @@
 [package]
 name = "web_server"
-version = "0.1.2"
+version = "0.1.20"
 description = "Small and dependency-less crate for creating HTTP servers"
 authors = ["Milesq <wmilosz88@gmail.com>"]
 edition = "2018"
