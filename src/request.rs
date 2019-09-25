@@ -11,6 +11,7 @@ pub struct Request {
     http_version: HttpVersion,
     pub headers: HashMap<String, String>,
     pub params: HashMap<String, String>,
+    pub query: HashMap<String, String>,
     body: String,
 }
 
@@ -43,6 +44,7 @@ impl TryFrom<String> for Request {
     fn try_from(req: String) -> Result<Self, Self::Error> {
         if let Some([info, headers, body]) = split_http_request(req) {
             let info: Vec<&str> = info.split(' ').collect();
+            let query = get_query_params(info[1]);
 
             if info.len() != 3 {
                 return Err(());
@@ -70,6 +72,7 @@ impl TryFrom<String> for Request {
                 http_version: http_version.unwrap(),
                 headers: headers.unwrap(),
                 params: HashMap::new(),
+                query,
                 body,
             })
         } else {
@@ -138,4 +141,20 @@ fn http_ver(s: &str) -> Option<HttpVersion> {
         "HTTP/2.0" => Some(HttpVersion::Ver2),
         _ => None,
     }
+}
+
+fn get_query_params(path: &str) -> HashMap<String, String> {
+    let query: Vec<&str> = path.split('?').collect();
+    let mut ret = HashMap::new();
+
+    if query.len() == 1 {
+        return HashMap::new();
+    }
+
+    for el in query[1].split('&') {
+        let parameter = el.split('=').collect::<Vec<&str>>();
+        ret.insert(parameter[0].to_string(), parameter[1].to_string());
+    }
+
+    ret
 }
