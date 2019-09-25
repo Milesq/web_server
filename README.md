@@ -43,3 +43,24 @@ web_server::new()
 ```rust
 .launch(PORT).unwrap()
 ```
+
+## Receiving post data
+e.g.
+```rust
+    use web_server::decoders::x_www_form_urlencoded;
+
+    web_server::new()
+        .post("/add-user", |req, _| {
+            println!("{}", req.get_body());
+            let body: HashMap<String, String> = x_www_form_urlencoded(req.get_body().as_str());
+            format!(
+                "Add new user: {}",
+                body.get("user").unwrap_or(&String::from("Error!"))
+            )
+            .into()
+        })
+        .launch(8080)
+        .unwrap();
+```
+
+Read examples/ to know more!
