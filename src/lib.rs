@@ -45,6 +45,10 @@ mod request;
 mod response;
 mod server;
 
+pub mod decoders {
+    pub use crate::request::x_www_form_urlencoded;
+}
+
 pub use http_code::HttpCode;
 pub use http_route::{HttpMethod, HttpRoute};
 use http_version::HttpVersion;
