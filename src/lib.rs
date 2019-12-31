@@ -38,6 +38,13 @@
 //! ```
 //! .launch(PORT).unwrap()
 //! ```
+//!
+//! You can send files to client e.g.
+//! ```
+//! .get("/image.png", |_, _| {
+//!     std::path::Path::new("path to your file").into();
+//! })
+//! ```
 mod http_code;
 mod http_route;
 mod http_version;

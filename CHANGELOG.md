@@ -1,4 +1,3 @@
-# In version 1.2 we add:
+# In version 1.3 we add:
 
-- x_www_form_urlencoded function
-- managing query parameters
+-   Send binary files by http. Handler function can return std::path::Path

@@ -2,9 +2,38 @@ use std::{
     collections::HashMap,
     convert::{From, Into},
     fmt::{self, Display},
+    fs::File,
+    io::Read,
+    path::Path,
 };
 
 use crate::{HttpCode, HttpVersion};
+
+#[derive(Debug, Clone)]
+pub enum Body {
+    Raw(Vec<u8>),
+    S(String),
+}
+
+use Body::*;
+
+impl Body {
+    pub fn unwrap_raw(self) -> Vec<u8> {
+        match self {
+            Raw(v) => v,
+            S(_) => panic!(""),
+        }
+    }
+}
+
+impl Display for Body {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            S(s) => write!(f, "{}", s.as_str()),
+            Raw(_) => panic!("Raw body cannot be display!!"),
+        }
+    }
+}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
@@ -13,7 +42,7 @@ pub struct Response {
     pub response_code: HttpCode,
     pub http_version: HttpVersion,
     pub headers: HashMap<String, String>,
-    pub body: String,
+    pub body: Body,
 }
 
 #[allow(clippy::new_without_default)]
@@ -39,7 +68,7 @@ impl From<&str> for Response {
             response_code: HttpCode::_200,
             http_version: HttpVersion::Ver11,
             headers,
-            body: resp.to_string(),
+            body: S(resp.to_string()),
         }
     }
 }
@@ -75,7 +104,39 @@ impl Display for Response {
             headers.trim_end().to_string()
         };
 
-        write!(f, "{}\r\n{}\r\n\r\n{}", info, headers, self.body)
+        if let S(body) = &self.body {
+            write!(f, "{}\r\n{}\r\n\r\n{}", info, headers, body.to_string())
+        } else {
+            let headers_result = write!(f, "{}\r\n{}\r\n\r\n", info, headers);
+            let body = self.body.clone().unwrap_raw();
+
+            unsafe {
+                f.write_str(std::str::from_utf8_unchecked(&body))
+                    .and(headers_result)
+            }
+        }
+    }
+}
+
+impl From<&Path> for Response {
+    fn from(value: &Path) -> Self {
+        if !value.is_file() {
+            println!("File {:?} doesn't exists!", value);
+
+            Response {
+                response_code: HttpCode::_404,
+                ..Response::new()
+            }
+        } else {
+            let mut f = File::open(value.display().to_string()).unwrap();
+            let mut buffer = Vec::new();
+            f.read_to_end(&mut buffer).unwrap();
+
+            Response {
+                body: Raw(buffer),
+                ..Response::new()
+            }
+        }
     }
 }
 
