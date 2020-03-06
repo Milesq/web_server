@@ -124,42 +124,48 @@ impl HttpServer {
         let server = TcpListener::bind(format!("{}:{}", ip, port).as_str())?;
 
         for stream in server.incoming() {
-            let mut stream = stream?;
-            let received = Request::try_from(read_to_string(&mut stream)?);
+            if let Ok(mut stream) = stream {
+                let received = Request::try_from(read_to_string(&mut stream).unwrap_or_default());
 
-            let resp = match received {
-                Err(_) => Response {
-                    response_code: HttpCode::_400,
-                    ..Response::new()
-                },
-                Ok(mut req) => {
-                    let mut resp = self.default_repsonse.clone();
-                    let mut matched_route: bool = false;
+                let resp = match received {
+                    Err(_) => Response {
+                        response_code: HttpCode::_400,
+                        ..Response::new()
+                    },
+                    Ok(mut req) => {
+                        let mut resp = self.default_repsonse.clone();
+                        let mut matched_route: bool = false;
 
-                    for route in self.routes.iter() {
-                        let (routes_matches, params) =
-                            matches_to_route(route.0.route.clone(), req.get_path());
+                        for route in self.routes.iter() {
+                            let (routes_matches, params) =
+                                matches_to_route(route.0.route.clone(), req.get_path());
 
-                        if (route.0.method == req.get_method() || route.0.method == HttpMethod::Any)
-                            && routes_matches
-                        {
-                            req.params = params;
-                            resp = route.1(req.clone(), Response::new());
-                            matched_route = true;
-                            break;
+                            if (route.0.method == req.get_method()
+                                || route.0.method == HttpMethod::Any)
+                                && routes_matches
+                            {
+                                req.params = params;
+                                resp = route.1(req.clone(), Response::new());
+                                matched_route = true;
+                                break;
+                            }
                         }
+
+                        if !matched_route {
+                            resp = (self.not_found_handler)(req.clone(), Response::new());
+                        }
+
+                        resp
                     }
+                };
 
-                    if !matched_route {
-                        resp = (self.not_found_handler)(req.clone(), Response::new());
-                    }
-
-                    resp
-                }
-            };
-
-            stream.write_all(resp.to_string().as_bytes())?;
-            stream.shutdown(net::Shutdown::Both)?;
+                stream
+                    .write_all(resp.to_string().as_bytes())
+                    .unwrap_or_else(|_| println!("Cannot write packet"));
+                stream
+                    .shutdown(net::Shutdown::Both)
+                    .unwrap_or_else(|_| println!("Cannot shutdown connection"));
+            }
         }
 
         Ok(())
