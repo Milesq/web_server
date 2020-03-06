@@ -11,3 +11,8 @@ readme = "README.md"
 
 [badges.travis-ci]
 repository = "Milesq/http_server"
+
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false # Disable features which are enabled by default
+features = ["precommit-hook", "run-cargo-clippy"]
