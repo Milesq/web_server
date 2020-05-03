@@ -1,6 +1,6 @@
 /target
 **/*.rs.bk
-
+.history/
 
 #Added by cargo
 #

@@ -4,8 +4,8 @@ use std::{
     collections::HashMap,
     io::{self, Read, Write},
     net::{self, TcpListener},
-    thread,
     sync::Arc,
+    thread,
 };
 
 type RequestHandler = fn(Request, Response) -> Response;
@@ -116,6 +116,7 @@ impl HttpServer {
     /// ```
     /// server.launch(8080).unwrap();
     /// ```
+    #[allow(clippy::empty_loop)]
     pub fn launch(self, port: i32) -> ! {
         let ip = if cfg!(debug_assertions) {
             "localhost"
@@ -131,7 +132,8 @@ impl HttpServer {
 
             thread::spawn(move || {
                 if let Ok(mut stream) = stream {
-                    let received = Request::try_from(read_to_string(&mut stream).unwrap_or_default());
+                    let received =
+                        Request::try_from(read_to_string(&mut stream).unwrap_or_default());
 
                     let resp = match received {
                         Err(_) => Response {
@@ -158,7 +160,7 @@ impl HttpServer {
                             }
 
                             if !matched_route {
-                                resp = (this.not_found_handler)(req.clone(), Response::new());
+                                resp = (this.not_found_handler)(req, Response::new());
                             }
 
                             resp
