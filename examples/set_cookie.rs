@@ -5,7 +5,8 @@ use web_server::{Request, Response};
 fn main() {
     web_server::new()
         .get("/", |req: Request, mut res: Response| {
-            println!("{:#?}", req.header("Cookie"));
+            println!("{:#?}", req.cookie("token"));
+            println!("{:#?}", req.cookies);
             res.set_header("Set-Cookie", "name=hello");
 
             res

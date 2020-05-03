@@ -1,3 +1,3 @@
-# In version 0.2.2 we changed:
+# In version 0.3.0 we changed:
 
--   Fix in parse headers
+-   Add cookies support

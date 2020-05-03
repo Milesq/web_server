@@ -9,7 +9,8 @@ pub struct Request {
     method: HttpMethod,
     path: String,
     http_version: HttpVersion,
-    pub headers: HashMap<String, String>,
+    headers: HashMap<String, String>,
+    pub cookies: Option<HashMap<String, String>>,
     pub params: HashMap<String, String>,
     pub query: HashMap<String, String>,
     body: String,
@@ -38,8 +39,14 @@ impl Request {
     }
 
     #[inline]
-    pub fn header(&self, key: &str) -> std::option::Option<&String> {
+    pub fn header(&self, key: &str) -> Option<&String> {
         self.headers.get(&key.to_string().to_lowercase())
+    }
+
+    #[inline]
+    pub fn cookie(&self, key: &str) -> Option<&String> {
+        let cookies = self.cookies.as_ref()?;
+        cookies.get(&key.to_string())
     }
 }
 
@@ -66,16 +73,18 @@ impl TryFrom<String> for Request {
                 return Err(());
             }
 
-            let headers = parse_headers(headers);
-            if headers.is_none() {
+            let headers = if let Some(headers) = parse_headers(headers) {
+                headers
+            } else {
                 return Err(());
-            }
+            };
 
             Ok(Self {
                 method: method.unwrap(),
                 path: info[1].to_string(),
                 http_version: http_version.unwrap(),
-                headers: headers.unwrap(),
+                cookies: parse_cookies(headers.get("cookie")),
+                headers,
                 params: HashMap::new(),
                 query,
                 body,
@@ -155,6 +164,33 @@ fn get_query(path: &str) -> HashMap<String, String> {
     }
 
     x_www_form_urlencoded(query[1])
+}
+
+fn parse_cookies(cookies: Option<&String>) -> Option<HashMap<String, String>> {
+    fn parse_cookie<'a>(cookie: &'a str) -> Option<[&'a str; 2]> {
+        let cookie = cookie
+            .split('=')
+            .take(2)
+            .map(|s| s.trim())
+            .collect::<Vec<&'a str>>();
+
+        Some([cookie.get(0)?, cookie.get(1)?])
+    }
+
+    let cookies = cookies?
+        .split(';')
+        .map(|el| parse_cookie(el))
+        .collect::<Vec<_>>();
+
+    let mut cookie_map = HashMap::new();
+
+    for cookie in cookies {
+        let [name, value] = cookie?;
+
+        cookie_map.insert(name.to_string(), value.to_string());
+    }
+
+    Some(cookie_map)
 }
 
 pub fn x_www_form_urlencoded(path: &str) -> HashMap<String, String> {
