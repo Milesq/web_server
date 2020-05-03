@@ -63,6 +63,12 @@ impl Response {
     }
 
     #[inline]
+    pub fn set_http_code(&mut self, resp_code: HttpCode) -> &Self {
+        self.response_code = resp_code;
+        self
+    }
+
+    #[inline]
     pub fn set_body(&mut self, body: &str) -> &Self {
         self.body = S(body.to_string());
         self
