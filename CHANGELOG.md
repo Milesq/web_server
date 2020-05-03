@@ -1,8 +1,3 @@
-# In version 0.2.1 we add:
+# In version 0.2.2 we changed:
 
--   Helpers for working with headers (Response.header, Response.set_header, Request.header)
--   std::thread based asynchronous processing requests
-
-## Api changes:
-
-- Now launch method returns never type
+-   Fix in parse headers
