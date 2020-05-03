@@ -52,8 +52,14 @@ impl Response {
     }
 
     #[inline]
-    pub fn header(&self, key: String) -> std::option::Option<&String> {
-        self.headers.get(&key)
+    pub fn header(&self, key: &str) -> std::option::Option<&String> {
+        self.headers.get(&key.to_string())
+    }
+
+    #[inline]
+    pub fn set_header(&mut self, key: &str, value: &str) -> &Self {
+        self.headers.insert(key.to_string(), value.to_string());
+        self
     }
 }
 

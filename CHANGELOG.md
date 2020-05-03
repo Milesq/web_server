@@ -1,3 +1,8 @@
-# In version 1.3 we add:
+# In version 1.4.1 we add:
 
--   Send binary files by http. Handler function can return std::path::Path
+-   Helpers for working with headers (Response.header, Response.set_header, Request.header)
+-   std::thread based asynchronous processing requests
+
+## Api changes:
+
+- Now launch method returns never type

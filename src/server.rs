@@ -4,6 +4,8 @@ use std::{
     collections::HashMap,
     io::{self, Read, Write},
     net::{self, TcpListener},
+    thread,
+    sync::Arc,
 };
 
 type RequestHandler = fn(Request, Response) -> Response;
@@ -105,7 +107,7 @@ impl HttpServer {
 
 impl HttpServer {
     /// Launch server on port 80
-    pub fn run(self) -> io::Result<()> {
+    pub fn run(self) -> ! {
         self.launch(80)
     }
 
@@ -114,61 +116,66 @@ impl HttpServer {
     /// ```
     /// server.launch(8080).unwrap();
     /// ```
-    pub fn launch(self, port: i32) -> io::Result<()> {
+    pub fn launch(self, port: i32) -> ! {
         let ip = if cfg!(debug_assertions) {
             "localhost"
         } else {
             "0.0.0.0"
         };
 
-        let server = TcpListener::bind(format!("{}:{}", ip, port).as_str())?;
+        let server = TcpListener::bind(format!("{}:{}", ip, port).as_str()).unwrap();
+        let this = Arc::new(self);
 
         for stream in server.incoming() {
-            if let Ok(mut stream) = stream {
-                let received = Request::try_from(read_to_string(&mut stream).unwrap_or_default());
+            let this = Arc::clone(&this);
 
-                let resp = match received {
-                    Err(_) => Response {
-                        response_code: HttpCode::_400,
-                        ..Response::new()
-                    },
-                    Ok(mut req) => {
-                        let mut resp = self.default_repsonse.clone();
-                        let mut matched_route: bool = false;
+            thread::spawn(move || {
+                if let Ok(mut stream) = stream {
+                    let received = Request::try_from(read_to_string(&mut stream).unwrap_or_default());
 
-                        for route in self.routes.iter() {
-                            let (routes_matches, params) =
-                                matches_to_route(route.0.route.clone(), req.get_path());
+                    let resp = match received {
+                        Err(_) => Response {
+                            response_code: HttpCode::_400,
+                            ..Response::new()
+                        },
+                        Ok(mut req) => {
+                            let mut resp = this.default_repsonse.clone();
+                            let mut matched_route: bool = false;
 
-                            if (route.0.method == req.get_method()
-                                || route.0.method == HttpMethod::Any)
-                                && routes_matches
-                            {
-                                req.params = params;
-                                resp = route.1(req.clone(), Response::new());
-                                matched_route = true;
-                                break;
+                            for route in this.routes.iter() {
+                                let (routes_matches, params) =
+                                    matches_to_route(route.0.route.clone(), req.get_path());
+
+                                if (route.0.method == req.get_method()
+                                    || route.0.method == HttpMethod::Any)
+                                    && routes_matches
+                                {
+                                    req.params = params;
+                                    resp = route.1(req.clone(), Response::new());
+                                    matched_route = true;
+                                    break;
+                                }
                             }
+
+                            if !matched_route {
+                                resp = (this.not_found_handler)(req.clone(), Response::new());
+                            }
+
+                            resp
                         }
+                    };
 
-                        if !matched_route {
-                            resp = (self.not_found_handler)(req.clone(), Response::new());
-                        }
-
-                        resp
-                    }
-                };
-
-                stream
-                    .write_all(resp.to_string().as_bytes())
-                    .unwrap_or_else(|_| println!("Cannot write packet"));
-                stream
-                    .shutdown(net::Shutdown::Both)
-                    .unwrap_or_else(|_| println!("Cannot shutdown connection"));
-            }
+                    stream
+                        .write_all(resp.to_string().as_bytes())
+                        .unwrap_or_else(|_| println!("Cannot write packet"));
+                    stream
+                        .shutdown(net::Shutdown::Both)
+                        .unwrap_or_else(|_| println!("Cannot shutdown connection"));
+                }
+            });
         }
 
-        Ok(())
+        loop {}
     }
 }
 

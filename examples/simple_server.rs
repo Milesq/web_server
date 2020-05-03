@@ -5,8 +5,7 @@ fn main() {
         .get("/user/:id", |request, _| {
             format!("{:?}", request.params.get("id")).into()
         })
-        .launch(8080)
-        .unwrap();
+        .launch(8080);
 }
 
 #[cfg(test)]

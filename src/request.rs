@@ -36,6 +36,11 @@ impl Request {
     pub fn get_body(&self) -> String {
         self.body.clone()
     }
+
+    #[inline]
+    pub fn header(&self, key: &str) -> std::option::Option<&String> {
+        self.headers.get(&key.to_string())
+    }
 }
 
 impl TryFrom<String> for Request {

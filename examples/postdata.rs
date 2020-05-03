@@ -14,6 +14,5 @@ fn main() {
             )
             .into()
         })
-        .launch(8080)
-        .unwrap();
+        .launch(8080);
 }

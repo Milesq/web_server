@@ -14,6 +14,5 @@ fn main() {
 
     web_server::create_server(default_response)
         .get("/", |_, _| "It can be fetched from browser by AJAX!".into())
-        .launch(8080)
-        .unwrap();
+        .launch(8080);
 }

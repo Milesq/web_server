@@ -10,8 +10,7 @@ fn main() {
         .any("/foo/bar/foobar", |_, _| {
             "Like First handler but any http method".into()
         })
-        .launch(8080)
-        .unwrap();
+        .launch(8080);
 }
 
 #[cfg(test)]
