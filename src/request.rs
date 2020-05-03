@@ -39,7 +39,7 @@ impl Request {
 
     #[inline]
     pub fn header(&self, key: &str) -> std::option::Option<&String> {
-        self.headers.get(&key.to_string())
+        self.headers.get(&key.to_string().to_lowercase())
     }
 }
 
@@ -111,17 +111,16 @@ fn parse_headers(headers: String) -> Option<HashMap<String, String>> {
         let mut next_char = 0 as char;
 
         while next_char != ':' {
-            let tmp = s.next();
+            next_char = s.next()?;
 
-            tmp?;
-
-            next_char = tmp.unwrap();
-            key.push(next_char);
+            if next_char != ':' {
+                key.push(next_char);
+            }
         }
 
         s.next();
 
-        Some((key, s.collect()))
+        Some((key.to_lowercase(), s.collect()))
     }
 
     let mut map = HashMap::new();
