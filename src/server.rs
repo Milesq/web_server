@@ -119,7 +119,7 @@ impl HttpServer {
     #[allow(clippy::empty_loop)]
     pub fn launch(self, port: i32) -> ! {
         let ip = if cfg!(debug_assertions) {
-            "localhost"
+            "127.0.0.1"
         } else {
             "0.0.0.0"
         };
