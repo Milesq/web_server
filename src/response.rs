@@ -57,25 +57,25 @@ impl Response {
     }
 
     #[inline]
-    pub fn set_header(&mut self, key: &str, value: &str) -> &Self {
+    pub fn set_header(&mut self, key: &str, value: &str) -> &mut Self {
         self.headers.insert(key.to_string(), value.to_string());
         self
     }
 
     #[inline]
-    pub fn set_http_code(&mut self, resp_code: HttpCode) -> &Self {
+    pub fn set_http_code(&mut self, resp_code: HttpCode) -> &mut Self {
         self.response_code = resp_code;
         self
     }
 
     #[inline]
-    pub fn set_body(&mut self, body: &str) -> &Self {
+    pub fn set_body(&mut self, body: &str) -> &mut Self {
         self.body = S(body.to_string());
         self
     }
 
     #[inline]
-    pub fn set_raw_body(&mut self, body: Vec<u8>) -> &Self {
+    pub fn set_raw_body(&mut self, body: Vec<u8>) -> &mut Self {
         self.body = Raw(body);
         self
     }
