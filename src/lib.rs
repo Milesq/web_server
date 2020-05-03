@@ -60,7 +60,7 @@ pub use http_code::HttpCode;
 pub use http_route::{HttpMethod, HttpRoute};
 use http_version::HttpVersion;
 pub use request::Request;
-pub use response::Response;
+pub use response::{Body, Response};
 pub use server::HttpServer;
 
 /// Create new instance of HttpServer

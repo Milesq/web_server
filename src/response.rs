@@ -61,6 +61,18 @@ impl Response {
         self.headers.insert(key.to_string(), value.to_string());
         self
     }
+
+    #[inline]
+    pub fn set_body(&mut self, body: &str) -> &Self {
+        self.body = S(body.to_string());
+        self
+    }
+
+    #[inline]
+    pub fn set_raw_body(&mut self, body: Vec<u8>) -> &Self {
+        self.body = Raw(body);
+        self
+    }
 }
 
 impl From<&str> for Response {
