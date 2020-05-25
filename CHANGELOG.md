@@ -1,3 +1,3 @@
-# In version 0.3.0 we changed:
+# In version 0.3.01 we changed:
 
--   Add cookies support
+-   Add missing 4\*\* response codes
