@@ -1,10 +1,8 @@
-extern crate web_server;
+use web_server::route;
 
 fn main() {
     web_server::new()
-        .get("/user/:id", |request, _| {
-            format!("{:?}", request.params.get("id")).into()
-        })
+        .get("/", &route!(|_, _| "".into()))
         .launch(8080);
 }
 
@@ -13,8 +11,8 @@ mod tests {
     #[test]
     fn simple_server() {
         web_server::new()
-            .get("/stats/:num", |_, _| "ok".into())
-            .post("/stats/:num", |_, _| "ok".into())
-            .any("/stats/:num", |_, _| "ok".into());
+            .get("/stats/:num", &route!(|_, _| "ok".into()))
+            .post("/stats/:num", &route!(|_, _| "ok".into()))
+            .any("/stats/:num", &route!(|_, _| "ok".into()));
     }
 }

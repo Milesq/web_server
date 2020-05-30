@@ -1,34 +1,40 @@
 use crate::{HttpCode, HttpMethod, Request, Response};
-use std::convert::TryFrom;
 use std::{
     collections::HashMap,
+    convert::TryFrom,
     io::{self, Read, Write},
     net::{self, TcpListener},
     sync::Arc,
     thread,
 };
 
-type RequestHandler = fn(Request, Response) -> Response;
+pub type RequestHandler<'a> = &'a dyn Fn(Request, Response) -> Response;
+
+/* impl<'a> fmt::Debug for RequestHandler<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Function")
+    }
+} */
 
 // first parameter = http path + http method
 // second parameter = function handler
-#[derive(Debug)]
-struct HttpHandler(crate::HttpRoute, RequestHandler);
+// #[derive(Debug)]
+struct HttpHandler<'a>(crate::HttpRoute, RequestHandler<'a>);
 
-#[derive(Debug)]
+// #[derive(Debug)]
 /// Storing basics informations about server and handlers
 /// Represents http server
-pub struct HttpServer {
-    routes: Vec<HttpHandler>,
-    not_found_handler: RequestHandler,
+pub struct HttpServer<'a> {
+    routes: Vec<HttpHandler<'a>>,
+    not_found_handler: RequestHandler<'a>,
     pub(crate) default_repsonse: Response,
 }
 
-impl Default for HttpServer {
+impl<'a> Default for HttpServer<'a> {
     fn default() -> Self {
         Self {
             routes: Vec::new(),
-            not_found_handler: |_, mut default_resp| {
+            not_found_handler: &|_, mut default_resp| {
                 default_resp.response_code = HttpCode::_404;
                 default_resp
             },
@@ -37,7 +43,7 @@ impl Default for HttpServer {
     }
 }
 
-impl HttpServer {
+impl<'a> HttpServer<'a> {
     /// Create new instance of HttpServer
     pub fn new() -> Self {
         Default::default()
@@ -48,9 +54,9 @@ impl HttpServer {
         mut self,
         method: HttpMethod,
         path: &'static str,
-        handler: RequestHandler,
+        handler: &'a RequestHandler<'a>,
     ) -> Self {
-        self.routes.push(HttpHandler(
+        self.routes.push(HttpHandler::<'a>(
             crate::HttpRoute {
                 method,
                 route: path.to_string(),
@@ -67,7 +73,7 @@ impl HttpServer {
     ///     database.get_user(request.params.get("id").unwrap()).into()
     /// })
     /// ```
-    pub fn get(self, path: &'static str, handler: RequestHandler) -> Self {
+    pub fn get(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
         self.route(HttpMethod::GET, path, handler)
     }
 
@@ -80,7 +86,7 @@ impl HttpServer {
     ///     default_repsonse
     /// })
     /// ```
-    pub fn post(self, path: &'static str, handler: RequestHandler) -> Self {
+    pub fn post(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
         self.route(HttpMethod::POST, path, handler)
     }
 
@@ -91,7 +97,7 @@ impl HttpServer {
     ///     .post("/endpoint", |request, default_response| "Gate POST were obtained".into())
     ///     .any("/endpoint", |request, default_response| "Another gate were obtained".into())
     /// ```
-    pub fn any(self, path: &'static str, handler: RequestHandler) -> Self {
+    pub fn any(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
         self.route(HttpMethod::Any, path, handler)
     }
 
@@ -99,13 +105,13 @@ impl HttpServer {
     /// ```
     /// server.not_found(|_, _| "Not found!".into());
     /// ```
-    pub fn not_found(mut self, handler: RequestHandler) -> Self {
+    pub fn not_found(mut self, handler: &'a RequestHandler<'a>) -> Self {
         self.not_found_handler = handler;
         self
     }
 }
 
-impl HttpServer {
+impl<'a> HttpServer<'a> {
     /// Launch server on port 80
     pub fn run(self) -> ! {
         self.launch(80)
@@ -128,7 +134,7 @@ impl HttpServer {
         let this = Arc::new(self);
 
         for stream in server.incoming() {
-            let this = Arc::clone(&this);
+            let _this = Arc::clone(&this);
 
             thread::spawn(move || {
                 if let Ok(mut stream) = stream {
@@ -140,10 +146,10 @@ impl HttpServer {
                             response_code: HttpCode::_400,
                             ..Response::new()
                         },
-                        Ok(mut req) => {
-                            let mut resp = this.default_repsonse.clone();
-                            let mut matched_route: bool = false;
-
+                        Ok(_req) => {
+                            // let mut resp = this.default_repsonse.clone();
+                            // let mut matched_route: bool = false;
+                            /*
                             for route in this.routes.iter() {
                                 let (routes_matches, params) =
                                     matches_to_route(route.0.route.clone(), req.get_path());
@@ -161,9 +167,10 @@ impl HttpServer {
 
                             if !matched_route {
                                 resp = (this.not_found_handler)(req, Response::new());
-                            }
+                            } */
+                            "resp: &str".into()
 
-                            resp
+                            // resp
                         }
                     };
 
@@ -207,7 +214,7 @@ fn read_all(readable: &mut impl Read) -> io::Result<Vec<u8>> {
     Ok(total)
 }
 
-fn matches_to_route(route: String, path: String) -> (bool, HashMap<String, String>) {
+fn _matches_to_route(route: String, path: String) -> (bool, HashMap<String, String>) {
     let route = route.split('/').filter(|el| el != &"");
     let path = path.split('/').filter(|el| el != &"");
 
