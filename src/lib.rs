@@ -53,6 +53,7 @@ mod request;
 mod response;
 mod server;
 
+/// Decoders for http request body
 pub mod decoders {
     pub use crate::request::x_www_form_urlencoded;
 }
@@ -70,7 +71,7 @@ pub fn new<'a>() -> HttpServer<'a> {
     HttpServer::new()
 }
 
-// Create new instance of HttpServer with predefined body
+/// Create new instance of HttpServer with predefined body
 pub fn create_server<'a>(default_repsonse: Response) -> HttpServer<'a> {
     let mut ret = HttpServer::new();
     ret.default_repsonse = default_repsonse;
