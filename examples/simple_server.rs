@@ -10,6 +10,8 @@ fn main() {
 mod tests {
     #[test]
     fn simple_server() {
+        use web_server::route;
+
         web_server::new()
             .get("/stats/:num", &route!(|_, _| "ok".into()))
             .post("/stats/:num", &route!(|_, _| "ok".into()))
