@@ -69,9 +69,9 @@ impl<'a> HttpServer<'a> {
 
     /// Add a route for GET method and a specific path
     /// ```
-    /// server.get("/user/:id", |request, _| {
+    /// server.get("/user/:id", &route!(|request, _| {
     ///     database.get_user(request.params.get("id").unwrap()).into()
-    /// })
+    /// }))
     /// ```
     pub fn get(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
         self.route(HttpMethod::GET, path, handler)
@@ -79,12 +79,12 @@ impl<'a> HttpServer<'a> {
 
     /// Add a route for POST method and a specific path
     /// ```
-    /// server.post("/add-user", |request, mut default_response| {
+    /// server.post("/add-user", &route!(|request, mut default_response| {
     ///     println!("Save new user!\n\n{}", request.get_body());
     ///
     ///     default_response.headers.insert("Access-Control-Allow-Origin", "*");
     ///     default_repsonse
-    /// })
+    /// }))
     /// ```
     pub fn post(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
         self.route(HttpMethod::POST, path, handler)
@@ -93,9 +93,9 @@ impl<'a> HttpServer<'a> {
     /// Add a route for a specific path and any method
     /// ```
     /// server
-    ///     .get("/endpoint", |request, default_response| "Gate GET were obtained".into())
-    ///     .post("/endpoint", |request, default_response| "Gate POST were obtained".into())
-    ///     .any("/endpoint", |request, default_response| "Another gate were obtained".into())
+    ///     .get("/endpoint", &route!(|request, default_response| "Gate GET were obtained".into()))
+    ///     .post("/endpoint", &route!(|request, default_response| "Gate POST were obtained".into()))
+    ///     .any("/endpoint", &route!(|request, default_response| "Another gate were obtained".into()))
     /// ```
     pub fn any(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
         self.route(HttpMethod::Any, path, handler)
@@ -103,7 +103,7 @@ impl<'a> HttpServer<'a> {
 
     /// Add a handler for 404 error
     /// ```
-    /// server.not_found(|_, _| "Not found!".into());
+    /// server.not_found(&route!(|_, _| "Not found!".into()));
     /// ```
     pub fn not_found(mut self, handler: &'a RequestHandler<'a>) -> Self {
         self.not_found_handler = handler;

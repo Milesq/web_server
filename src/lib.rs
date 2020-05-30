@@ -9,10 +9,11 @@
 //!
 //! First server using web_server
 //! ```
-//! extern crate web_server;
+//! use web_server::route;
+//!
 //! web_server::new()
-//!    .get("/", |request: web_server::Request, mut response: web_server::Response|
-//!         "Hello World!".into())
+//!    .get("/", &route!(|request: web_server::Request, mut response: web_server::Response|
+//!         "Hello World!".into()))
 //!    .launch(80)
 //!    .unwrap();
 //! ```
@@ -24,14 +25,14 @@
 //! ```
 //! then you can declare your endpoints. E.g.
 //! ```
-//! .get("/your/path", |request, default_response| {
+//! .get("/your/path", &route!(|request, default_response| {
 //!     // There place your logic
 //!     // This function returns Response
 //!     "response text".into()
-//! })
-//! .post("/your/path", |_, _| "Handler for POST method")
-//! .route(web_server::HttpMethod::DELETE, "/your/path", |_, _| "Handler for DELETE method")
-//! .any("/your/path", |_, _| "Handler for any method")
+//! }))
+//! .post("/your/path", &route!(|_, _| "Handler for POST method".into()))
+//! .route(web_server::HttpMethod::DELETE, "/your/path", &route!(|_, _| "Handler for DELETE method".into()))
+//! .any("/your/path", &route!(|_, _| "Handler for any method"))
 //! ```
 //!
 //! Now you must run server by launch method
@@ -41,9 +42,9 @@
 //!
 //! You can send files to client e.g.
 //! ```
-//! .get("/image.png", |_, _| {
+//! .get("/image.png", &route!(|_, _| {
 //!     std::path::Path::new("path to your file").into();
-//! })
+//! }))
 //! ```
 mod http_code;
 mod http_route;
@@ -76,6 +77,7 @@ pub fn create_server<'a>(default_repsonse: Response) -> HttpServer<'a> {
     ret
 }
 
+/// Cast function to RequestHandler
 #[macro_export]
 macro_rules! route {
     ($f:expr) => {{
