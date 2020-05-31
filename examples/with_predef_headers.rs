@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use web_server::{route, Response};
+use web_server::Response;
 
 fn main() {
     let mut headers = HashMap::new();
@@ -13,7 +13,7 @@ fn main() {
     web_server::create_server(default_response)
         .get(
             "/",
-            &route!(|_, _| "It can be fetched from browser by AJAX!".into()),
+            Box::new(|_, _| "It can be fetched from browser by AJAX!".into()),
         )
         .launch(8080);
 }

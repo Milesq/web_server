@@ -1,8 +1,6 @@
-use web_server::route;
-
 fn main() {
     web_server::new()
-        .get("/", &route!(|_, _| "".into()))
+        .get("/", Box::new(|_, _| "".into()))
         .launch(8080);
 }
 
@@ -10,11 +8,9 @@ fn main() {
 mod tests {
     #[test]
     fn simple_server() {
-        use web_server::route;
-
         web_server::new()
-            .get("/stats/:num", &route!(|_, _| "ok".into()))
-            .post("/stats/:num", &route!(|_, _| "ok".into()))
-            .any("/stats/:num", &route!(|_, _| "ok".into()));
+            .get("/stats/:num", Box::new(|_, _| "ok".into()))
+            .post("/stats/:num", Box::new(|_, _| "ok".into()))
+            .any("/stats/:num", Box::new(|_, _| "ok".into()));
     }
 }

@@ -1,11 +1,11 @@
 use std::collections::HashMap;
-use web_server::{decoders::x_www_form_urlencoded, route};
+use web_server::decoders::x_www_form_urlencoded;
 
 fn main() {
     web_server::new()
         .post(
             "/add-user",
-            &route!(|req, _| {
+            Box::new(|req, _| {
                 println!("{}", req.get_body());
                 let body: HashMap<String, String> = x_www_form_urlencoded(req.get_body().as_str());
                 format!(

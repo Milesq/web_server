@@ -12,7 +12,7 @@
 //! use web_server::route;
 //!
 //! web_server::new()
-//!    .get("/", &route!(|request: web_server::Request, mut response: web_server::Response|
+//!    .get("/", Box::new(|request: web_server::Request, mut response: web_server::Response|
 //!         "Hello World!".into()))
 //!    .launch(80)
 //!    .unwrap();
@@ -25,14 +25,14 @@
 //! ```
 //! then you can declare your endpoints. E.g.
 //! ```
-//! .get("/your/path", &route!(|request, default_response| {
+//! .get("/your/path", Box::new(|request, default_response| {
 //!     // There place your logic
 //!     // This function returns Response
 //!     "response text".into()
 //! }))
-//! .post("/your/path", &route!(|_, _| "Handler for POST method".into()))
-//! .route(web_server::HttpMethod::DELETE, "/your/path", &route!(|_, _| "Handler for DELETE method".into()))
-//! .any("/your/path", &route!(|_, _| "Handler for any method"))
+//! .post("/your/path", Box::new(|_, _| "Handler for POST method".into()))
+//! .route(web_server::HttpMethod::DELETE, "/your/path", Box::new(|_, _| "Handler for DELETE method".into()))
+//! .any("/your/path", Box::new(|_, _| "Handler for any method"))
 //! ```
 //!
 //! Now you must run server by launch method
@@ -42,7 +42,7 @@
 //!
 //! You can send files to client e.g.
 //! ```
-//! .get("/image.png", &route!(|_, _| {
+//! .get("/image.png", Box::new(|_, _| {
 //!     std::path::Path::new("path to your file").into();
 //! }))
 //! ```
@@ -67,22 +67,13 @@ pub use server::HttpServer;
 pub use server::RequestHandler;
 
 /// Create new instance of HttpServer
-pub fn new<'a>() -> HttpServer<'a> {
+pub fn new() -> HttpServer {
     HttpServer::new()
 }
 
 /// Create new instance of HttpServer with predefined body
-pub fn create_server<'a>(default_repsonse: Response) -> HttpServer<'a> {
+pub fn create_server(default_repsonse: Response) -> HttpServer {
     let mut ret = HttpServer::new();
     ret.default_repsonse = default_repsonse;
     ret
-}
-
-/// Cast function to RequestHandler
-#[macro_export]
-macro_rules! route {
-    ($f:expr) => {{
-        let function: $crate::RequestHandler = &$f;
-        function
-    }};
 }

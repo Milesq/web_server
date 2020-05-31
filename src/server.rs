@@ -4,46 +4,36 @@ use std::{
     convert::TryFrom,
     io::{self, Read, Write},
     net::{self, TcpListener},
-    sync::Arc,
-    thread,
 };
 
-pub type RequestHandler<'a> = &'a dyn Fn(Request, Response) -> Response;
-
-/* impl<'a> fmt::Debug for RequestHandler<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Function")
-    }
-} */
+pub type RequestHandler = Box<dyn Send + (Fn(Request, Response) -> Response) + 'static>;
 
 // first parameter = http path + http method
 // second parameter = function handler
-// #[derive(Debug)]
-struct HttpHandler<'a>(crate::HttpRoute, RequestHandler<'a>);
+struct HttpHandler(crate::HttpRoute, RequestHandler);
 
-// #[derive(Debug)]
 /// Storing basics informations about server and handlers
 /// Represents http server
-pub struct HttpServer<'a> {
-    routes: Vec<HttpHandler<'a>>,
-    not_found_handler: RequestHandler<'a>,
+pub struct HttpServer {
+    routes: Vec<HttpHandler>,
+    not_found_handler: RequestHandler,
     pub(crate) default_repsonse: Response,
 }
 
-impl<'a> Default for HttpServer<'a> {
+impl Default for HttpServer {
     fn default() -> Self {
         Self {
             routes: Vec::new(),
-            not_found_handler: &|_, mut default_resp| {
+            not_found_handler: Box::new(|_, mut default_resp| {
                 default_resp.response_code = HttpCode::_404;
                 default_resp
-            },
+            }),
             default_repsonse: Response::new(),
         }
     }
 }
 
-impl<'a> HttpServer<'a> {
+impl HttpServer {
     /// Create new instance of HttpServer
     pub fn new() -> Self {
         Default::default()
@@ -54,9 +44,9 @@ impl<'a> HttpServer<'a> {
         mut self,
         method: HttpMethod,
         path: &'static str,
-        handler: &'a RequestHandler<'a>,
+        handler: RequestHandler,
     ) -> Self {
-        self.routes.push(HttpHandler::<'a>(
+        self.routes.push(HttpHandler(
             crate::HttpRoute {
                 method,
                 route: path.to_string(),
@@ -69,49 +59,49 @@ impl<'a> HttpServer<'a> {
 
     /// Add a route for GET method and a specific path
     /// ```
-    /// server.get("/user/:id", &route!(|request, _| {
+    /// server.get("/user/:id", Box::new(|request, _| {
     ///     database.get_user(request.params.get("id").unwrap()).into()
     /// }))
     /// ```
-    pub fn get(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
+    pub fn get(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::GET, path, handler)
     }
 
     /// Add a route for POST method and a specific path
     /// ```
-    /// server.post("/add-user", &route!(|request, mut default_response| {
+    /// server.post("/add-user", Box::new(|request, mut default_response| {
     ///     println!("Save new user!\n\n{}", request.get_body());
     ///
     ///     default_response.headers.insert("Access-Control-Allow-Origin", "*");
     ///     default_repsonse
     /// }))
     /// ```
-    pub fn post(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
+    pub fn post(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::POST, path, handler)
     }
 
     /// Add a route for a specific path and any method
     /// ```
     /// server
-    ///     .get("/endpoint", &route!(|request, default_response| "Gate GET were obtained".into()))
-    ///     .post("/endpoint", &route!(|request, default_response| "Gate POST were obtained".into()))
-    ///     .any("/endpoint", &route!(|request, default_response| "Another gate were obtained".into()))
+    ///     .get("/endpoint", Box::new(|request, default_response| "Gate GET were obtained".into()))
+    ///     .post("/endpoint", Box::new(|request, default_response| "Gate POST were obtained".into()))
+    ///     .any("/endpoint", Box::new(|request, default_response| "Another gate were obtained".into()))
     /// ```
-    pub fn any(self, path: &'static str, handler: &'a RequestHandler<'a>) -> Self {
+    pub fn any(self, path: &'static str, handler: RequestHandler) -> Self {
         self.route(HttpMethod::Any, path, handler)
     }
 
     /// Add a handler for 404 error
     /// ```
-    /// server.not_found(&route!(|_, _| "Not found!".into()));
+    /// server.not_found(Box::new(|_, _| "Not found!".into()));
     /// ```
-    pub fn not_found(mut self, handler: &'a RequestHandler<'a>) -> Self {
+    pub fn not_found(mut self, handler: RequestHandler) -> Self {
         self.not_found_handler = handler;
         self
     }
 }
 
-impl<'a> HttpServer<'a> {
+impl HttpServer {
     /// Launch server on port 80
     pub fn run(self) -> ! {
         self.launch(80)
@@ -131,57 +121,50 @@ impl<'a> HttpServer<'a> {
         };
 
         let server = TcpListener::bind(format!("{}:{}", ip, port).as_str()).unwrap();
-        let this = Arc::new(self);
 
         for stream in server.incoming() {
-            let _this = Arc::clone(&this);
+            if let Ok(mut stream) = stream {
+                let received = Request::try_from(read_to_string(&mut stream).unwrap_or_default());
 
-            thread::spawn(move || {
-                if let Ok(mut stream) = stream {
-                    let received =
-                        Request::try_from(read_to_string(&mut stream).unwrap_or_default());
+                let resp = match received {
+                    Err(_) => Response {
+                        response_code: HttpCode::_400,
+                        ..Response::new()
+                    },
+                    Ok(mut req) => {
+                        let mut resp = self.default_repsonse.clone();
+                        let mut matched_route: bool = false;
 
-                    let resp = match received {
-                        Err(_) => Response {
-                            response_code: HttpCode::_400,
-                            ..Response::new()
-                        },
-                        Ok(_req) => {
-                            // let mut resp = this.default_repsonse.clone();
-                            // let mut matched_route: bool = false;
-                            /*
-                            for route in this.routes.iter() {
-                                let (routes_matches, params) =
-                                    matches_to_route(route.0.route.clone(), req.get_path());
+                        for route in self.routes.iter() {
+                            let (routes_matches, params) =
+                                matches_to_route(route.0.route.clone(), req.get_path());
 
-                                if (route.0.method == req.get_method()
-                                    || route.0.method == HttpMethod::Any)
-                                    && routes_matches
-                                {
-                                    req.params = params;
-                                    resp = route.1(req.clone(), Response::new());
-                                    matched_route = true;
-                                    break;
-                                }
+                            if (route.0.method == req.get_method()
+                                || route.0.method == HttpMethod::Any)
+                                && routes_matches
+                            {
+                                req.params = params;
+                                resp = route.1(req.clone(), Response::new());
+                                matched_route = true;
+                                break;
                             }
-
-                            if !matched_route {
-                                resp = (this.not_found_handler)(req, Response::new());
-                            } */
-                            "resp: &str".into()
-
-                            // resp
                         }
-                    };
 
-                    stream
-                        .write_all(resp.to_string().as_bytes())
-                        .unwrap_or_else(|_| println!("Cannot write packet"));
-                    stream
-                        .shutdown(net::Shutdown::Both)
-                        .unwrap_or_else(|_| println!("Cannot shutdown connection"));
-                }
-            });
+                        if !matched_route {
+                            resp = (self.not_found_handler)(req, Response::new());
+                        }
+
+                        resp
+                    }
+                };
+
+                stream
+                    .write_all(resp.to_string().as_bytes())
+                    .unwrap_or_else(|_| println!("Cannot write packet"));
+                stream
+                    .shutdown(net::Shutdown::Both)
+                    .unwrap_or_else(|_| println!("Cannot shutdown connection"));
+            }
         }
 
         loop {}
@@ -214,7 +197,7 @@ fn read_all(readable: &mut impl Read) -> io::Result<Vec<u8>> {
     Ok(total)
 }
 
-fn _matches_to_route(route: String, path: String) -> (bool, HashMap<String, String>) {
+fn matches_to_route(route: String, path: String) -> (bool, HashMap<String, String>) {
     let route = route.split('/').filter(|el| el != &"");
     let path = path.split('/').filter(|el| el != &"");
 
