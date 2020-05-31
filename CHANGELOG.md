@@ -1,3 +1,4 @@
-# In version 0.3.41 we changed:
+# In version 0.4.0 we changed:
 
--   Add missing 4\*\* response codes
+-   Now you pass the Boxed closure, not function as endpoint listener
+-   Requests are now supported synchronous
