@@ -106,7 +106,7 @@ impl HttpServer {
 
 impl HttpServer {
     /// Launch server on port 80
-    pub fn run(self) {
+    pub fn run(&self) {
         self.launch(80)
     }
 
@@ -120,7 +120,7 @@ impl HttpServer {
     /// server.launch(8080).unwrap();
     /// ```
     #[allow(clippy::empty_loop)]
-    pub fn launch(self, port: i32) {
+    pub fn launch(&self, port: i32) {
         let ip = if cfg!(debug_assertions) {
             "127.0.0.1"
         } else {
