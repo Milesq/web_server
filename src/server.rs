@@ -18,6 +18,8 @@ pub struct HttpServer {
     routes: Vec<HttpHandler>,
     not_found_handler: RequestHandler,
     pub(crate) default_repsonse: Response,
+
+    to_close: bool,
 }
 
 impl Default for HttpServer {
@@ -29,6 +31,7 @@ impl Default for HttpServer {
                 default_resp
             }),
             default_repsonse: Response::new(),
+            to_close: false,
         }
     }
 }
@@ -103,8 +106,12 @@ impl HttpServer {
 
 impl HttpServer {
     /// Launch server on port 80
-    pub fn run(self) -> ! {
+    pub fn run(self) {
         self.launch(80)
+    }
+
+    pub fn close(&mut self) {
+        self.to_close = true;
     }
 
     /// Lauch http server, never returns
@@ -113,7 +120,7 @@ impl HttpServer {
     /// server.launch(8080).unwrap();
     /// ```
     #[allow(clippy::empty_loop)]
-    pub fn launch(self, port: i32) -> ! {
+    pub fn launch(self, port: i32) {
         let ip = if cfg!(debug_assertions) {
             "127.0.0.1"
         } else {
@@ -123,6 +130,10 @@ impl HttpServer {
         let server = TcpListener::bind(format!("{}:{}", ip, port).as_str()).unwrap();
 
         for stream in server.incoming() {
+            if self.to_close {
+                break;
+            }
+
             if let Ok(mut stream) = stream {
                 let received = Request::try_from(read_to_string(&mut stream).unwrap_or_default());
 
@@ -166,8 +177,6 @@ impl HttpServer {
                     .unwrap_or_else(|_| println!("Cannot shutdown connection"));
             }
         }
-
-        loop {}
     }
 }
 
