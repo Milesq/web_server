@@ -57,6 +57,9 @@ mod server_utils;
 /// Decoders for http request body
 pub mod decoders {
     pub use crate::request::x_www_form_urlencoded;
+}
+
+pub mod utils {
     pub use crate::server_utils::redirect;
 }
 
