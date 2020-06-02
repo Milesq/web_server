@@ -4,7 +4,7 @@ use std::{
     fmt::{self, Display},
     fs::File,
     io::Read,
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use crate::{HttpCode, HttpVersion};
@@ -145,10 +145,9 @@ impl Display for Response {
 impl From<&Path> for Response {
     fn from(value: &Path) -> Self {
         if !value.is_file() {
-            println!("File {:?} doesn't exists!", value);
-
             Response {
                 response_code: HttpCode::_404,
+                body: S(format!("File {:?} doesn't exists!", value)),
                 ..Response::new()
             }
         } else {
@@ -161,6 +160,12 @@ impl From<&Path> for Response {
                 ..Response::new()
             }
         }
+    }
+}
+
+impl From<&PathBuf> for Response {
+    fn from(value: &PathBuf) -> Self {
+        value.as_path().into()
     }
 }
 
