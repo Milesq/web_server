@@ -52,10 +52,12 @@ mod http_version;
 mod request;
 mod response;
 mod server;
+mod server_utils;
 
 /// Decoders for http request body
 pub mod decoders {
     pub use crate::request::x_www_form_urlencoded;
+    pub use crate::server_utils::redirect;
 }
 
 pub use http_code::HttpCode;
