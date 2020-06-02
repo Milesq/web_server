@@ -24,6 +24,13 @@ impl Body {
             S(_) => panic!(""),
         }
     }
+
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Raw(v) => v.is_empty(),
+            S(s) => s.is_empty(),
+        }
+    }
 }
 
 impl Display for Body {
@@ -128,11 +135,18 @@ impl Display for Response {
             headers.trim_end().to_string()
         };
 
-        if let S(body) = &self.body {
+        let mut this: Self = self.clone();
+
+        if this.body.is_empty() {
+            let http_code_str = this.response_code.to_string();
+            this.body = S(http_code_str);
+        }
+
+        if let S(body) = &this.body {
             write!(f, "{}\r\n{}\r\n\r\n{}", info, headers, body.to_string())
         } else {
             let headers_result = write!(f, "{}\r\n{}\r\n\r\n", info, headers);
-            let body = self.body.clone().unwrap_raw();
+            let body = this.body.clone().unwrap_raw();
 
             unsafe {
                 f.write_str(std::str::from_utf8_unchecked(&body))
