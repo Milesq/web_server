@@ -5,10 +5,17 @@ use std::fmt::{self, Display};
 pub enum HttpCode {
     _110,
     _111,
+
     _200,
+    _300,
     _301,
     _302,
+    _303,
+    _304,
+    _307,
+    _308,
     _310,
+
     _400,
     _401,
     _402,
@@ -37,6 +44,7 @@ pub enum HttpCode {
     _428,
     _429,
     _431,
+
     _500,
 }
 
@@ -49,6 +57,11 @@ impl Display for HttpCode {
                 HttpCode::_110 => "Connection Timed Out",
                 HttpCode::_111 => "Connection refused",
                 HttpCode::_200 => "OK",
+                HttpCode::_300 => "Multiple Choice",
+                HttpCode::_303 => "See Other",
+                HttpCode::_304 => "Not Modified",
+                HttpCode::_307 => "Temporary Redirect",
+                HttpCode::_308 => "Permanent Redirect",
                 HttpCode::_301 => "Moved Permanently",
                 HttpCode::_302 => "Found",
                 HttpCode::_310 => "Too many redirects",
