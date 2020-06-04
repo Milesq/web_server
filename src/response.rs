@@ -138,8 +138,8 @@ impl Display for Response {
         let mut this: Self = self.clone();
 
         if this.body.is_empty() {
-            let http_code_str = this.response_code.to_string();
-            this.body = S(http_code_str);
+            let http_code_str = this.response_code;
+            this.body = S(format!("Server respond with code: {}", http_code_str));
         }
 
         if let S(body) = &this.body {
