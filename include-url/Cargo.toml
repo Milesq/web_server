@@ -1,0 +1,11 @@
+[package]
+name = "include-url"
+version = "0.1.0"
+authors = ["Milesq <wmilosz88@gmail.com>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+isahc = "0.9.3"

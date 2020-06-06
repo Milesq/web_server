@@ -9,6 +9,8 @@ use std::{
 
 use crate::{HttpCode, HttpVersion};
 
+mod match_content_type;
+
 #[derive(Debug, Clone)]
 pub enum Body {
     Raw(Vec<u8>),
@@ -169,9 +171,16 @@ impl From<&Path> for Response {
             let mut buffer = Vec::new();
             f.read_to_end(&mut buffer).unwrap();
 
+            let mut resp = Response::new();
+            let ext = value
+                .extension()
+                .map(|el| el.to_str().unwrap())
+                .unwrap_or("txt");
+            resp.set_header("Content-Type", match_content_type::to_ext(ext));
+
             Response {
                 body: Raw(buffer),
-                ..Response::new()
+                ..resp
             }
         }
     }
