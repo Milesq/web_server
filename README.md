@@ -1,6 +1,7 @@
 # Http Server lib for Rust
 
 [![Build Status](https://travis-ci.com/Milesq/web_server.svg?branch=master)](https://travis-ci.com/Milesq/http_server)
+[![dependency status](https://deps.rs/repo/github/milesq/web_server/status.svg)](https://deps.rs/repo/github/milesq/web_server)
 
 ## web_server is a small, dependency-less crate for creating HTTP servers.
 
