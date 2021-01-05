@@ -8,4 +8,4 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-isahc = "0.9.3"
+isahc = "1.0.2"
