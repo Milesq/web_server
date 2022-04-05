@@ -208,7 +208,8 @@ fn read_all(readable: &mut impl Read) -> io::Result<Vec<u8>> {
 
 fn matches_to_route(route: String, path: String) -> (bool, HashMap<String, String>) {
     let route = route.split('/').filter(|el| el != &"");
-    let path = path.split('/').filter(|el| el != &"");
+    let path = path.split('?').next().unwrap()
+                   .split('/').filter(|el| el != &"");
 
     if route.clone().count() != path.clone().count() {
         return (false, HashMap::new());
