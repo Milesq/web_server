@@ -6,23 +6,23 @@ use std::{
     net::{self, TcpListener},
 };
 
-pub type RequestHandler = Box<dyn Send + (Fn(Request, Response) -> Response) + 'static>;
+pub type RequestHandler<'a> = Box<dyn Send + (Fn(Request, Response) -> Response) + 'a>;
 
 // first parameter = http path + http method
 // second parameter = function handler
-struct HttpHandler(crate::HttpRoute, RequestHandler);
+struct HttpHandler<'a>(crate::HttpRoute, RequestHandler<'a>);
 
 /// Storing basics informations about server and handlers
 /// Represents http server
-pub struct HttpServer {
-    routes: Vec<HttpHandler>,
-    not_found_handler: RequestHandler,
+pub struct HttpServer<'a> {
+    routes: Vec<HttpHandler<'a>>,
+    not_found_handler: RequestHandler<'a>,
     pub(crate) default_repsonse: Response,
 
     to_close: bool,
 }
 
-impl Default for HttpServer {
+impl<'a> Default for HttpServer<'a> {
     fn default() -> Self {
         Self {
             routes: Vec::new(),
@@ -36,7 +36,7 @@ impl Default for HttpServer {
     }
 }
 
-impl HttpServer {
+impl<'a> HttpServer<'a> {
     /// Create new instance of HttpServer
     pub fn new() -> Self {
         Default::default()
@@ -46,8 +46,8 @@ impl HttpServer {
     pub fn route(
         mut self,
         method: HttpMethod,
-        path: &'static str,
-        handler: RequestHandler,
+        path: &'a str,
+        handler: RequestHandler<'a>,
     ) -> Self {
         self.routes.push(HttpHandler(
             crate::HttpRoute {
@@ -66,7 +66,7 @@ impl HttpServer {
     ///     database.get_user(request.params.get("id").unwrap()).into()
     /// }))
     /// ```
-    pub fn get(self, path: &'static str, handler: RequestHandler) -> Self {
+    pub fn get(self, path: &'a str, handler: RequestHandler<'a>) -> Self {
         self.route(HttpMethod::GET, path, handler)
     }
 
@@ -79,7 +79,7 @@ impl HttpServer {
     ///     default_repsonse
     /// }))
     /// ```
-    pub fn post(self, path: &'static str, handler: RequestHandler) -> Self {
+    pub fn post(self, path: &'a str, handler: RequestHandler<'a>) -> Self {
         self.route(HttpMethod::POST, path, handler)
     }
 
@@ -90,7 +90,7 @@ impl HttpServer {
     ///     .post("/endpoint", Box::new(|request, default_response| "Gate POST were obtained".into()))
     ///     .any("/endpoint", Box::new(|request, default_response| "Another gate were obtained".into()))
     /// ```
-    pub fn any(self, path: &'static str, handler: RequestHandler) -> Self {
+    pub fn any(self, path: &'a str, handler: RequestHandler<'a>) -> Self {
         self.route(HttpMethod::Any, path, handler)
     }
 
@@ -98,13 +98,13 @@ impl HttpServer {
     /// ```
     /// server.not_found(Box::new(|_, _| "Not found!".into()));
     /// ```
-    pub fn not_found(mut self, handler: RequestHandler) -> Self {
+    pub fn not_found(mut self, handler: RequestHandler<'a>) -> Self {
         self.not_found_handler = handler;
         self
     }
 }
 
-impl HttpServer {
+impl<'a> HttpServer<'a> {
     /// Launch server on port 80
     pub fn run(&self) {
         self.launch(80)
