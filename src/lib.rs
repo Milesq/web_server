@@ -72,12 +72,12 @@ pub use server::HttpServer;
 pub use server::RequestHandler;
 
 /// Create new instance of HttpServer
-pub fn new() -> HttpServer {
+pub fn new<'a>() -> HttpServer<'a> {
     HttpServer::new()
 }
 
 /// Create new instance of HttpServer with predefined body
-pub fn create_server(default_repsonse: Response) -> HttpServer {
+pub fn create_server<'a>(default_repsonse: Response) -> HttpServer<'a> {
     let mut ret = HttpServer::new();
     ret.default_repsonse = default_repsonse;
     ret
